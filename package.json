@@ -1,0 +1,57 @@
+{
+  "name": "@gud/bench",
+  "version": "0.0.0",
+  "description": "A powerful and elegant benchmarking tool for JavaScript and TypeScript.",
+  "license": "Apache-2.0",
+  "author": "Ryan Goree (https://github.com/ryangoree)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ryangoree/gud-bench"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "bin": {
+    "bench": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "peerDependencies": {
+    "typescript": ">5"
+  },
+  "dependencies": {
+    "@delvtech/drift": "^0.10.0",
+    "@gud/math": "^1.0.0",
+    "clide-js": "^0.3.0-next.8",
+    "clide-plugin-command-menu": "^0.3.0-next.2"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.4",
+    "@types/node": "^24.0.3",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "build:watch": "tsc --watch",
+    "bench": "node --expose-gc dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

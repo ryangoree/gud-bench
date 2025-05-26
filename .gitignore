@@ -1,0 +1,38 @@
+# local
+*.env
+*.pem
+*.local
+
+# ai
+*.ai
+
+# logs
+logs
+_.log
+
+# artifacts
+dist
+out
+build
+results
+
+# testing
+coverage
+
+# package manager
+node_modules
+*.tgz
+
+# language
+*.tsbuildinfo
+
+# os
+.DS_Store
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# config
+web3-dev-cli.json*
