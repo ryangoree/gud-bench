@@ -1,4 +1,4 @@
-import { describe, it, before, after } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { Benchmark, benchmark } from '../dist/Benchmark.js';
 
@@ -27,9 +27,9 @@ describe('Benchmark', () => {
     it('should add named test functions', () => {
       const bench = new Benchmark();
       const testFn = () => 42;
-      
+
       bench.test('Simple test', testFn);
-      
+
       assert.strictEqual(bench.tests.length, 1);
       assert.strictEqual(bench.tests[0].name, 'Simple test');
       assert.strictEqual(bench.tests[0].fn, testFn);
@@ -38,9 +38,9 @@ describe('Benchmark', () => {
     it('should add anonymous test functions with auto-generated names', () => {
       const bench = new Benchmark();
       const testFn = () => 42;
-      
+
       bench.test(testFn);
-      
+
       assert.strictEqual(bench.tests.length, 1);
       assert.strictEqual(bench.tests[0].name, 'Test 1');
       assert.strictEqual(bench.tests[0].fn, testFn);
@@ -48,11 +48,11 @@ describe('Benchmark', () => {
 
     it('should add multiple tests', () => {
       const bench = new Benchmark();
-      
+
       bench.test('Test 1', () => 1);
       bench.test('Test 2', () => 2);
       bench.test(() => 3);
-      
+
       assert.strictEqual(bench.tests.length, 3);
       assert.strictEqual(bench.tests[0].name, 'Test 1');
       assert.strictEqual(bench.tests[1].name, 'Test 2');
@@ -64,19 +64,19 @@ describe('Benchmark', () => {
     it('should run basic benchmark with minimal iterations', async () => {
       const bench = new Benchmark('Speed Test');
       let counter = 0;
-      
+
       bench.test('Increment', () => {
         counter++;
         return counter;
       });
-      
+
       bench.test('Add', () => {
         return 1 + 1;
       });
-      
+
       // Run with minimal iterations for speed and verbosity 0 for silence
       await bench.run(10, { verbosity: 0 });
-      
+
       assert.strictEqual(bench.results.length, 2);
       assert.strictEqual(bench.results[0].name, 'Increment');
       assert.strictEqual(bench.results[1].name, 'Add');
@@ -89,14 +89,14 @@ describe('Benchmark', () => {
 
     it('should handle async test functions', async () => {
       const bench = new Benchmark('Async Test');
-      
+
       bench.test('Async delay', async () => {
-        await new Promise(resolve => setTimeout(resolve, 1));
+        await new Promise((resolve) => setTimeout(resolve, 1));
         return 'done';
       });
-      
+
       await bench.run(5, { verbosity: 0 });
-      
+
       assert.strictEqual(bench.results.length, 1);
       assert.strictEqual(bench.results[0].runs, 5);
       assert.ok(bench.results[0].time > 0);
@@ -105,21 +105,21 @@ describe('Benchmark', () => {
     it('should respect verbosity settings', async () => {
       const bench = new Benchmark();
       bench.test('Silent test', () => 42);
-      
+
       // These should not throw and should run silently
       await bench.run(5, { verbosity: 0 });
       await bench.run(5, { verbosity: 1 });
       await bench.run(5, { verbosity: 2 });
-      
+
       assert.strictEqual(bench.results.length, 1); // Only last run kept
     });
 
     it('should handle multiple cycles', async () => {
       const bench = new Benchmark();
       bench.test('Multi-cycle test', () => Math.random());
-      
+
       await bench.run(5, { cycles: 3, verbosity: 0 });
-      
+
       assert.strictEqual(bench.results.length, 1);
       assert.strictEqual(bench.results[0].runs, 5);
       // With multiple cycles, we should have more samples
@@ -131,25 +131,25 @@ describe('Benchmark', () => {
     it('should preheat tests', async () => {
       const bench = new Benchmark();
       let callCount = 0;
-      
+
       bench.test('Counter', () => {
         callCount++;
         return callCount;
       });
-      
+
       // Preheat should run the test
       await bench.preheat(5, { verbosity: 0 });
-      
+
       assert.ok(callCount >= 5);
       assert.strictEqual(bench.results.length, 1); // Preheat now stores results
-      
+
       // Clear results to test separate run
       bench.results.length = 0;
-      
+
       // Now run actual benchmark
       const initialCount = callCount;
       await bench.run(3, { verbosity: 0 });
-      
+
       assert.ok(callCount >= initialCount + 3);
       assert.strictEqual(bench.results.length, 1);
     });
@@ -157,14 +157,14 @@ describe('Benchmark', () => {
     it('should inherit GC strategy in preheat', async () => {
       const bench = new Benchmark();
       bench.test('GC test', () => 42);
-      
+
       // Should not throw when passing GC options
-      await bench.preheat(2, { 
-        verbosity: 0, 
+      await bench.preheat(2, {
+        verbosity: 0,
         gcStrategy: 'never',
-        gcInterval: 100 
+        gcInterval: 100,
       });
-      
+
       assert.strictEqual(bench.results.length, 1); // Preheat stores results now
     });
   });
@@ -179,9 +179,9 @@ describe('Benchmark', () => {
         }
         return 'done';
       });
-      
+
       await bench.run(10, { verbosity: 0 });
-      
+
       const result = bench.results[0];
       assert.ok(result.time > 0);
       assert.strictEqual(result.runs, 10);
@@ -193,9 +193,9 @@ describe('Benchmark', () => {
     it('should export results to JSON', async () => {
       const bench = new Benchmark('Export Test');
       bench.test('Export test', () => 42);
-      
+
       await bench.run(5, { verbosity: 0 });
-      
+
       // Test the data structure that would be exported
       const expectedData = {
         name: bench.name,
@@ -207,13 +207,13 @@ describe('Benchmark', () => {
           marginOfError: result.marginOfError || 0,
         })),
       };
-      
+
       assert.strictEqual(expectedData.name, 'Export Test');
       assert.ok(Array.isArray(expectedData.results));
       assert.strictEqual(expectedData.results.length, 1);
       assert.strictEqual(expectedData.results[0].name, 'Export test');
       assert.ok(typeof expectedData.results[0].mean === 'number');
-      
+
       // Test that exportToJson method exists and can be called
       // (We'll skip actually writing the file to avoid filesystem dependencies)
       assert.ok(typeof bench.exportToJson === 'function');
@@ -226,7 +226,7 @@ describe('Benchmark', () => {
       bench.test('Error test', () => {
         throw new Error('Test error');
       });
-      
+
       // Should not throw but handle the error
       try {
         await bench.run(2, { verbosity: 0 });
@@ -240,7 +240,7 @@ describe('Benchmark', () => {
 
     it('should handle empty test suite', async () => {
       const bench = new Benchmark();
-      
+
       // Running with no tests should not crash
       await bench.run(5, { verbosity: 0 });
       assert.strictEqual(bench.results.length, 0);

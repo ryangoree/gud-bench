@@ -1,6 +1,12 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert';
-import { writeFileSync, unlinkSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import {
+  writeFileSync,
+  unlinkSync,
+  existsSync,
+  mkdirSync,
+  rmSync,
+} from 'node:fs';
 import { join, resolve } from 'node:path';
 import { loadModule } from '../dist/utils/loadModule.js';
 
@@ -8,7 +14,7 @@ describe('loadModule', () => {
   const testDir = resolve('./test-modules');
   const jsFile = join(testDir, 'test.js');
   const tsFile = join(testDir, 'test.ts');
-  
+
   before(() => {
     // Create test directory if it doesn't exist
     try {
@@ -41,11 +47,11 @@ describe('loadModule', () => {
           return 'Default export';
         }
       `;
-      
+
       writeFileSync(testFile, jsContent);
-      
+
       const module = await loadModule(testFile);
-      
+
       assert.ok(module);
       assert.ok(typeof module.testFunction === 'function');
       assert.strictEqual(module.testFunction(), 'JavaScript test');
@@ -65,11 +71,11 @@ describe('loadModule', () => {
           return a * b;
         }
       `;
-      
+
       writeFileSync(testFile, jsContent);
-      
+
       const module = await loadModule(testFile);
-      
+
       assert.strictEqual(module.add(2, 3), 5);
       assert.strictEqual(module.multiply(4, 5), 20);
     });
@@ -92,11 +98,11 @@ describe('loadModule', () => {
           return obj.value * 2;
         }
       `;
-      
+
       writeFileSync(tsFile, tsContent);
-      
+
       const module = await loadModule(tsFile);
-      
+
       assert.ok(module);
       assert.ok(typeof module.typedFunction === 'function');
       assert.strictEqual(module.typedFunction('World'), 'Hello World');
@@ -119,16 +125,16 @@ describe('loadModule', () => {
           return { name, fn };
         }
       `;
-      
+
       writeFileSync(tsFile, tsContent);
-      
+
       const module = await loadModule(tsFile);
-      
+
       assert.ok(module.benchmarks);
       assert.strictEqual(module.benchmarks.simpleTest(), 'simple');
       assert.strictEqual(module.benchmarks.paramTest('test'), 'param: test');
       assert.strictEqual(module.benchmarks.numberTest(5), 6);
-      
+
       assert.ok(typeof module.createBenchmark === 'function');
       const benchmark = module.createBenchmark('test', () => 'result');
       assert.strictEqual(benchmark.name, 'test');
@@ -153,11 +159,11 @@ describe('loadModule', () => {
           isString: (value: any): value is string => typeof value === 'string'
         };
       `;
-      
+
       writeFileSync(tsFile, tsContent);
-      
+
       const module = await loadModule(tsFile);
-      
+
       assert.ok(typeof module.readTestFile === 'function');
       assert.ok(module.utils);
       assert.ok(typeof module.utils.joinPath === 'function');
@@ -171,7 +177,7 @@ describe('loadModule', () => {
     it('should detect TypeScript files by .ts extension', async () => {
       const tsContent = `export const isTS = true;`;
       writeFileSync(tsFile, tsContent);
-      
+
       const module = await loadModule(tsFile);
       assert.strictEqual(module.isTS, true);
     });
@@ -180,7 +186,7 @@ describe('loadModule', () => {
       const testFile = join(testDir, 'extension-test.js');
       const jsContent = `export const isJS = true;`;
       writeFileSync(testFile, jsContent);
-      
+
       const module = await loadModule(testFile);
       assert.strictEqual(module.isJS, true);
     });
@@ -192,9 +198,9 @@ describe('loadModule', () => {
           return 'TSX Component';
         }
       `;
-      
+
       writeFileSync(tsxFile, tsxContent);
-      
+
       try {
         const module = await loadModule(tsxFile);
         assert.ok(typeof module.Component === 'function');
@@ -223,9 +229,9 @@ describe('loadModule', () => {
           return "This won't compile";
         }
       `;
-      
+
       writeFileSync(tsFile, invalidTsContent);
-      
+
       try {
         await loadModule(tsFile);
         // If it doesn't throw, that's also acceptable as TypeScript transpiler
@@ -243,9 +249,9 @@ describe('loadModule', () => {
           return "This won't parse";
         }
       `;
-      
+
       writeFileSync(jsFile, invalidJsContent);
-      
+
       try {
         await loadModule(jsFile);
         assert.fail('Should have thrown an error');
@@ -290,21 +296,21 @@ describe('loadModule', () => {
           return arr.sort((a, b) => a - b);
         }
       `;
-      
+
       writeFileSync(testFile, benchmarkContent);
-      
+
       const module = await loadModule(testFile);
-      
+
       assert.ok(typeof module.quickSort === 'function');
       assert.ok(typeof module.bubbleSort === 'function');
       assert.ok(typeof module.default === 'function');
-      
+
       // Test that functions actually work
       const testArray = [3, 1, 4, 1, 5];
       const quickSorted = module.quickSort(testArray);
       const bubbleSorted = module.bubbleSort(testArray);
       const defaultSorted = module.default(testArray);
-      
+
       assert.deepStrictEqual(quickSorted, [1, 1, 3, 4, 5]);
       assert.deepStrictEqual(bubbleSorted, [1, 1, 3, 4, 5]);
       assert.deepStrictEqual(defaultSorted, [1, 1, 3, 4, 5]);

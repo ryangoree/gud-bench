@@ -1,5 +1,5 @@
-import { parseFixed } from '@gud/math';
 import { writeFileSync } from 'node:fs';
+import { parseFixed } from '@gud/math';
 import { Logger } from './utils/Logger.js';
 
 type ValueOption<V> = {
@@ -133,14 +133,14 @@ export class Benchmark<TValue = any, TReturn = any> {
    */
   test<V extends TValue, R extends TReturn>(
     name: string,
-    fn: TestFunction<V, R>
+    fn: TestFunction<V, R>,
   ): Benchmark<V, R>;
   test<V extends TValue, R extends TReturn>(
-    fn: TestFunction<V, R>
+    fn: TestFunction<V, R>,
   ): Benchmark<V, R>;
   test<V extends TValue, R extends TReturn>(
     name: string | TestFunction<V, R>,
-    fn = name as TestFunction<V, R>
+    fn = name as TestFunction<V, R>,
   ): Benchmark<V, R> {
     if (typeof name === 'function') {
       name = `Test ${this.tests.length + 1}`;
@@ -162,7 +162,7 @@ export class Benchmark<TValue = any, TReturn = any> {
   ) {
     if (verbosity > 0) {
       Logger.pending(
-        `Preheating ${this.tests.length} tests in ${this.name} ${iterations} times each...`
+        `Preheating ${this.tests.length} tests in ${this.name} ${iterations} times each...`,
       );
     }
     return this.run(iterations, {
@@ -203,16 +203,16 @@ export class Benchmark<TValue = any, TReturn = any> {
       Logger.group(
         `${this.name}${name ? `${Logger.text.dim(' - ')}${name}` : ''}${
           cycles > 1 ? Logger.text.dim(` (${cycles} cycles)`) : ''
-        }`
+        }`,
       );
       Logger.pending(
-        `Running ${this.tests.length} tests ${iterations} times each...`
+        `Running ${this.tests.length} tests ${iterations} times each...`,
       );
       if (verbosity > 1) {
         Logger.log(
           `GC Strategy: ${gcStrategy}${
             gcStrategy === 'periodic' ? ` (every ${gcInterval} iterations)` : ''
-          }`
+          }`,
         );
       }
       if (value !== undefined && verbosity > 1) {
@@ -319,7 +319,7 @@ export class Benchmark<TValue = any, TReturn = any> {
             const meanTime = test.time / test.runs;
             result['± (%)'] = `${safeFormat(
               (test.marginOfError / meanTime) * 100,
-              2
+              2,
             )}%`;
           }
 
@@ -329,12 +329,12 @@ export class Benchmark<TValue = any, TReturn = any> {
             }`,
             result,
           ];
-        })
+        }),
     );
 
     Logger.table(resultData);
     Logger.info(
-      Logger.text.italic(`Total time: ${safeFormat(totalTime)} ms\n`)
+      Logger.text.italic(`Total time: ${safeFormat(totalTime)} ms\n`),
     );
   }
 
@@ -424,7 +424,7 @@ export class Benchmark<TValue = any, TReturn = any> {
       testCompleted: boolean;
       iterationCount: number;
       gcInterval: number;
-    }
+    },
   ) {
     switch (strategy) {
       case 'never':

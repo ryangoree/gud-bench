@@ -29,7 +29,7 @@ export async function loadModule(filePath: string) {
 
     // Create a data URL with the transpiled JavaScript
     const dataUrl = `data:text/javascript;base64,${Buffer.from(
-      jsContent
+      jsContent,
     ).toString('base64')}`;
     return await import(dataUrl);
   } else {

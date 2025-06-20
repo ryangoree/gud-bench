@@ -12,11 +12,11 @@ describe('Logger', () => {
     // Capture console output for testing
     originalConsoleLog = console.log;
     originalConsoleError = console.error;
-    
+
     console.log = (...args) => {
       logOutput.push(args.join(' '));
     };
-    
+
     console.error = (...args) => {
       errorOutput.push(args.join(' '));
     };
@@ -45,7 +45,9 @@ describe('Logger', () => {
       const result = Logger('Test message');
       // Logger function returns a new Logger instance when called
       assert.ok(typeof result === 'function');
-      assert.ok(result.name === 'Logger' || result.constructor.name === 'Logger');
+      assert.ok(
+        result.name === 'Logger' || result.constructor.name === 'Logger',
+      );
     });
   });
 
@@ -96,10 +98,14 @@ describe('Logger', () => {
   describe('Color formatting', () => {
     it('should return chainable logger for color methods', () => {
       const redLogger = Logger.red;
-      assert.ok(typeof redLogger === 'function' || typeof redLogger === 'object');
-      
+      assert.ok(
+        typeof redLogger === 'function' || typeof redLogger === 'object',
+      );
+
       const blueLogger = Logger.blue;
-      assert.ok(typeof blueLogger === 'function' || typeof blueLogger === 'object');
+      assert.ok(
+        typeof blueLogger === 'function' || typeof blueLogger === 'object',
+      );
     });
 
     it('should support chained color formatting', () => {
@@ -140,7 +146,7 @@ describe('Logger', () => {
       const fileName = 'test-file';
       const key = 'testFunction';
       const result = `${fileName}${Logger.text.dim('#')}${key}`;
-      
+
       assert.ok(result.includes('test-file'));
       assert.ok(result.includes('#'));
       assert.ok(result.includes('testFunction'));
@@ -175,11 +181,11 @@ describe('Logger', () => {
     before(() => {
       originalConsoleGroup = console.group;
       originalConsoleGroupEnd = console.groupEnd;
-      
+
       console.group = (...args) => {
         groupCalls.push(['group', ...args]);
       };
-      
+
       console.groupEnd = () => {
         groupCalls.push(['groupEnd']);
       };
@@ -197,7 +203,7 @@ describe('Logger', () => {
     it('should support grouping', () => {
       Logger.group('Test Group');
       Logger.groupEnd();
-      
+
       assert.strictEqual(groupCalls.length, 2);
       assert.strictEqual(groupCalls[0][0], 'group');
       assert.strictEqual(groupCalls[1][0], 'groupEnd');
@@ -226,11 +232,11 @@ describe('Logger', () => {
     it('should support table output', () => {
       const data = [
         { name: 'Test 1', value: 100 },
-        { name: 'Test 2', value: 200 }
+        { name: 'Test 2', value: 200 },
       ];
-      
+
       Logger.table(data);
-      
+
       assert.strictEqual(tableCalls.length, 1);
       assert.strictEqual(tableCalls[0][0], data);
     });

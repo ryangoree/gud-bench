@@ -625,7 +625,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
         {
           cancelMessage = 'Operation canceled.',
           defaultValue = true,
-        }: LoggerConfirmOptions = {}
+        }: LoggerConfirmOptions = {},
       ): Promise<boolean> {
         const prefix = format([SGR.CYAN], '? ');
         const suffix = defaultValue
@@ -656,7 +656,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
           if (!answer.match(/^(|y|yes|n|no)$/i)) {
             // Create fresh logger for error message to avoid contamination
             createLogger().error(
-              'Invalid answer. Please enter y, yes, n, or no'
+              'Invalid answer. Please enter y, yes, n, or no',
             );
             return ask();
           }

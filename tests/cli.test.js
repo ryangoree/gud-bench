@@ -1,13 +1,13 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert';
 import { spawn } from 'node:child_process';
-import { writeFileSync, unlinkSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { writeFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 describe('CLI Integration', () => {
   const testDir = './test-cli-files';
   const cliPath = './dist/cli.js';
-  
+
   before(() => {
     // Create test directory
     if (!existsSync(testDir)) {
@@ -27,7 +27,7 @@ describe('CLI Integration', () => {
       const child = spawn('node', [cliPath, ...args], {
         stdio: 'pipe',
         cwd: process.cwd(),
-        ...options
+        ...options,
       });
 
       let stdout = '';
@@ -60,7 +60,7 @@ describe('CLI Integration', () => {
   describe('CLI Help and Usage', () => {
     it('should show help when requested', async () => {
       const result = await runCLI(['--help']);
-      
+
       assert.strictEqual(result.code, 0);
       assert.ok(result.stdout.includes('Usage:'));
       assert.ok(result.stdout.includes('OPTIONS:'));
@@ -70,7 +70,7 @@ describe('CLI Integration', () => {
 
     it('should show help for run command', async () => {
       const result = await runCLI(['run', '--help']);
-      
+
       assert.strictEqual(result.code, 0);
       assert.ok(result.stdout.includes('files'));
       assert.ok(result.stdout.includes('runs'));
@@ -98,16 +98,19 @@ describe('CLI Integration', () => {
           return Promise.resolve('async result');
         }
       `;
-      
+
       writeFileSync(testFile, testContent);
-      
+
       const result = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '50',
-        '--verbosity', '1'
+        '--files',
+        testFile,
+        '--runs',
+        '50',
+        '--verbosity',
+        '1',
       ]);
-      
+
       assert.strictEqual(result.code, 0);
       assert.ok(result.stdout.includes('fastFunction'));
       assert.ok(result.stdout.includes('slowFunction'));
@@ -123,16 +126,19 @@ describe('CLI Integration', () => {
           return Math.random() * 100;
         }
       `;
-      
+
       writeFileSync(testFile, testContent);
-      
+
       const result = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '30',
-        '--verbosity', '1'
+        '--files',
+        testFile,
+        '--runs',
+        '30',
+        '--verbosity',
+        '1',
       ]);
-      
+
       assert.strictEqual(result.code, 0);
       assert.ok(result.stdout.includes('default-export'));
       assert.ok(result.stdout.includes('Total time:'));
@@ -158,16 +164,19 @@ describe('CLI Integration', () => {
         
         export const constValue: number = 123;
       `;
-      
+
       writeFileSync(testFile, testContent);
-      
+
       const result = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '40',
-        '--verbosity', '1'
+        '--files',
+        testFile,
+        '--runs',
+        '40',
+        '--verbosity',
+        '1',
       ]);
-      
+
       assert.strictEqual(result.code, 0);
       assert.ok(result.stdout.includes('typedSort'));
       assert.ok(result.stdout.includes('arraySum'));
@@ -180,27 +189,33 @@ describe('CLI Integration', () => {
       const testFile = join(testDir, 'verbosity-test.js');
       const testContent = `export function simple() { return 1; }`;
       writeFileSync(testFile, testContent);
-      
+
       // Test silent mode
       const silentResult = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '10',
-        '--verbosity', '0'
+        '--files',
+        testFile,
+        '--runs',
+        '10',
+        '--verbosity',
+        '0',
       ]);
-      
+
       assert.strictEqual(silentResult.code, 0);
       // Silent mode should produce minimal output
       assert.ok(silentResult.stdout.length < 100);
-      
+
       // Test verbose mode
       const verboseResult = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '10',
-        '--verbosity', '2'
+        '--files',
+        testFile,
+        '--runs',
+        '10',
+        '--verbosity',
+        '2',
       ]);
-      
+
       assert.strictEqual(verboseResult.code, 0);
       assert.ok(verboseResult.stdout.length > silentResult.stdout.length);
     });
@@ -209,49 +224,66 @@ describe('CLI Integration', () => {
       const testFile = join(testDir, 'cycles-test.js');
       const testContent = `export function test() { return Math.random(); }`;
       writeFileSync(testFile, testContent);
-      
+
       const result = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '20',
-        '--cycles', '3',
-        '--verbosity', '1'
+        '--files',
+        testFile,
+        '--runs',
+        '20',
+        '--cycles',
+        '3',
+        '--verbosity',
+        '1',
       ]);
-      
+
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('cycles') || result.stdout.includes('Cycle'));
+      assert.ok(
+        result.stdout.includes('cycles') || result.stdout.includes('Cycle'),
+      );
     });
 
     it('should handle preheat option', async () => {
       const testFile = join(testDir, 'preheat-test.js');
       const testContent = `export function preheatTest() { return 'preheated'; }`;
       writeFileSync(testFile, testContent);
-      
+
       const result = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '20',
-        '--preheat', '10',
-        '--verbosity', '2'
+        '--files',
+        testFile,
+        '--runs',
+        '20',
+        '--preheat',
+        '10',
+        '--verbosity',
+        '2',
       ]);
-      
+
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('Preheating') || result.stdout.includes('preheat'));
+      assert.ok(
+        result.stdout.includes('Preheating') ||
+          result.stdout.includes('preheat'),
+      );
     });
 
     it('should handle custom benchmark name', async () => {
       const testFile = join(testDir, 'named-test.js');
       const testContent = `export function namedFunction() { return 'named'; }`;
       writeFileSync(testFile, testContent);
-      
+
       const result = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '15',
-        '--name', 'Custom Benchmark Name',
-        '--verbosity', '1'
+        '--files',
+        testFile,
+        '--runs',
+        '15',
+        '--name',
+        'Custom Benchmark Name',
+        '--verbosity',
+        '1',
       ]);
-      
+
       assert.strictEqual(result.code, 0);
       assert.ok(result.stdout.includes('Custom Benchmark Name'));
     });
@@ -270,29 +302,38 @@ describe('CLI Integration', () => {
         }
       `;
       writeFileSync(testFile, testContent);
-      
+
       // Test with 'never' strategy
       const neverResult = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '20',
-        '--gcStrategy', 'never',
-        '--verbosity', '2'
+        '--files',
+        testFile,
+        '--runs',
+        '20',
+        '--gcStrategy',
+        'never',
+        '--verbosity',
+        '2',
       ]);
-      
+
       assert.strictEqual(neverResult.code, 0);
       assert.ok(neverResult.stdout.includes('never'));
-      
+
       // Test with 'periodic' strategy
       const periodicResult = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '20',
-        '--gcStrategy', 'periodic',
-        '--gcInterval', '10',
-        '--verbosity', '2'
+        '--files',
+        testFile,
+        '--runs',
+        '20',
+        '--gcStrategy',
+        'periodic',
+        '--gcInterval',
+        '10',
+        '--verbosity',
+        '2',
       ]);
-      
+
       assert.strictEqual(periodicResult.code, 0);
       assert.ok(periodicResult.stdout.includes('periodic'));
     });
@@ -302,17 +343,20 @@ describe('CLI Integration', () => {
     it('should benchmark multiple files', async () => {
       const file1 = join(testDir, 'multi-file-1.js');
       const file2 = join(testDir, 'multi-file-2.js');
-      
+
       writeFileSync(file1, `export function file1Test() { return 'file1'; }`);
       writeFileSync(file2, `export function file2Test() { return 'file2'; }`);
-      
+
       const result = await runCLI([
         'run',
-        '--files', `${file1},${file2}`,
-        '--runs', '15',
-        '--verbosity', '1'
+        '--files',
+        `${file1},${file2}`,
+        '--runs',
+        '15',
+        '--verbosity',
+        '1',
       ]);
-      
+
       assert.strictEqual(result.code, 0);
       assert.ok(result.stdout.includes('Loading 2 files'));
       assert.ok(result.stdout.includes('file1Test'));
@@ -324,40 +368,40 @@ describe('CLI Integration', () => {
     it('should handle non-existent files gracefully', async () => {
       const result = await runCLI([
         'run',
-        '--files', './non-existent-file.js',
-        '--runs', '10'
+        '--files',
+        './non-existent-file.js',
+        '--runs',
+        '10',
       ]);
-      
+
       assert.notStrictEqual(result.code, 0);
-      assert.ok(result.stderr.includes('not found') || result.stdout.includes('not found'));
+      assert.ok(
+        result.stderr.includes('not found') ||
+          result.stdout.includes('not found'),
+      );
     });
 
     it('should handle files with no functions', async () => {
       const testFile = join(testDir, 'no-functions.js');
       const testContent = `const value = 42; export { value };`;
       writeFileSync(testFile, testContent);
-      
-      const result = await runCLI([
-        'run',
-        '--files', testFile,
-        '--runs', '10'
-      ]);
-      
+
+      const result = await runCLI(['run', '--files', testFile, '--runs', '10']);
+
       assert.notStrictEqual(result.code, 0);
-      assert.ok(result.stderr.includes('function') || result.stdout.includes('function'));
+      assert.ok(
+        result.stderr.includes('function') ||
+          result.stdout.includes('function'),
+      );
     });
 
     it('should handle syntax errors in files', async () => {
       const testFile = join(testDir, 'syntax-error.js');
       const testContent = `export function broken( { return "broken"; }`;
       writeFileSync(testFile, testContent);
-      
-      const result = await runCLI([
-        'run',
-        '--files', testFile,
-        '--runs', '10'
-      ]);
-      
+
+      const result = await runCLI(['run', '--files', testFile, '--runs', '10']);
+
       assert.notStrictEqual(result.code, 0);
     });
   });
@@ -379,16 +423,19 @@ describe('CLI Integration', () => {
         }
       `;
       writeFileSync(testFile, testContent);
-      
+
       const result = await runCLI([
         'run',
-        '--files', testFile,
-        '--runs', '100',
-        '--verbosity', '1'
+        '--files',
+        testFile,
+        '--runs',
+        '100',
+        '--verbosity',
+        '1',
       ]);
-      
+
       assert.strictEqual(result.code, 0);
-      
+
       // Check for table structure
       assert.ok(result.stdout.includes('│')); // Table borders
       assert.ok(result.stdout.includes('┌')); // Table top
@@ -397,10 +444,10 @@ describe('CLI Integration', () => {
       assert.ok(result.stdout.includes('Total Time'));
       assert.ok(result.stdout.includes('AVG Time'));
       assert.ok(result.stdout.includes('Ops/Sec'));
-      
+
       // Check for winner indicator
       assert.ok(result.stdout.includes('🏆'));
-      
+
       // Check for total time
       assert.ok(result.stdout.includes('Total time:'));
       assert.ok(result.stdout.includes('ms'));

@@ -1,5 +1,51 @@
 {
-	"linter": {
-		"enabled": false
-	}
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "assist": {
+    "enabled": true
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "lineEnding": "lf",
+    "lineWidth": 80
+  },
+  "linter": {
+    "enabled": true,
+
+    "rules": {
+      "complexity": {
+        "noBannedTypes": "off"
+      },
+      "correctness": {
+        "noEmptyCharacterClassInRegex": "off"
+      },
+      "style": {
+        "noNonNullAssertion": {
+          "level": "info",
+          "fix": "none"
+        },
+        "noParameterAssign": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noAssignInExpressions": "off",
+        "noEmptyInterface": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "all",
+      "indentStyle": "space",
+      "indentWidth": 2
+    }
+  }
 }

@@ -1,6 +1,6 @@
-import { command } from 'clide-js';
 import { existsSync } from 'node:fs';
-import { resolve, extname, basename } from 'node:path';
+import { basename, extname, resolve } from 'node:path';
+import { command } from 'clide-js';
 import { benchmark, type RunOptions, type TestFunction } from '../Benchmark.js';
 import { Logger } from '../utils/Logger.js';
 import { loadModule } from '../utils/loadModule.js';
@@ -119,7 +119,7 @@ export default command({
     const bench = benchmark(customName);
 
     Logger.pending(
-      `📁 Loading ${resolvedFiles.length} files for benchmarking...`
+      `📁 Loading ${resolvedFiles.length} files for benchmarking...`,
     );
 
     // Load and prepare test functions
@@ -151,7 +151,7 @@ export default command({
               didFindFunction = true;
               bench.test(
                 `${fileName}${Logger.text.dim('#')}${key}`,
-                value as TestFunction
+                value as TestFunction,
               );
             }
           }
