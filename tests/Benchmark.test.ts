@@ -80,8 +80,8 @@ describe('Benchmark', () => {
       assert.strictEqual(bench.results.length, 2);
       assert.strictEqual(bench.results[0].name, 'Increment');
       assert.strictEqual(bench.results[1].name, 'Add');
-      assert.strictEqual(bench.results[0].runs, 10);
-      assert.strictEqual(bench.results[1].runs, 10);
+      assert.strictEqual(bench.results[0].samples.length, 10);
+      assert.strictEqual(bench.results[1].samples.length, 10);
       assert.ok(bench.results[0].time > 0);
       assert.ok(bench.results[1].time > 0);
       assert.ok(counter >= 10); // Should have been called at least 10 times
@@ -98,7 +98,7 @@ describe('Benchmark', () => {
       await bench.run(5, { verbosity: 0 });
 
       assert.strictEqual(bench.results.length, 1);
-      assert.strictEqual(bench.results[0].runs, 5);
+      assert.strictEqual(bench.results[0].samples.length, 5);
       assert.ok(bench.results[0].time > 0);
     });
 
@@ -121,9 +121,7 @@ describe('Benchmark', () => {
       await bench.run(5, { cycles: 3, verbosity: 0 });
 
       assert.strictEqual(bench.results.length, 1);
-      assert.strictEqual(bench.results[0].runs, 5);
-      // With multiple cycles, we should have more samples
-      assert.ok(bench.results[0].samples.length >= 5);
+      assert.strictEqual(bench.results[0].samples.length, 5 * 3); // 5 runs * 3 cycles
     });
   });
 
@@ -184,7 +182,6 @@ describe('Benchmark', () => {
 
       const result = bench.results[0];
       assert.ok(result.time > 0);
-      assert.strictEqual(result.runs, 10);
       assert.strictEqual(result.samples.length, 10);
       assert.ok(result.opsPerSecond !== undefined);
       assert.ok(result.opsPerSecond > 0);
@@ -202,7 +199,7 @@ describe('Benchmark', () => {
         results: bench.results.map((result) => ({
           name: result.name,
           samples: result.samples,
-          mean: result.time / result.runs,
+          mean: result.time / result.samples.length,
           stdDev: result.stdDeviation || 0,
           marginOfError: result.marginOfError || 0,
         })),

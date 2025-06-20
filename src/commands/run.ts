@@ -189,9 +189,18 @@ export default command({
 
     // Export results if requested
     if (shouldExport) {
-      // Export to JSON with timestamp
       const timestamp = Date.now();
-      const jsonFileName = `benchmarks/benchmark-run-${timestamp}.json`;
+
+      let jsonFileName: string;
+      if (resolvedFiles.length > 1) {
+        // If multiple files, use a generic name
+        jsonFileName = `benchmark-suite-${timestamp}.json`;
+      } else {
+        // If single file, use the file name with timestamp
+        const fileName = basename(resolvedFiles[0], extname(resolvedFiles[0]));
+        jsonFileName = `${fileName}-${timestamp}.json`;
+      }
+
       bench.exportToJson(jsonFileName);
     }
   },

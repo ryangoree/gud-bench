@@ -75,36 +75,29 @@ export type RunArgs<V = any, R = any> = undefined extends V
   ? [number, RunOptions<V, R>?]
   : [number, RunOptions<V, R>];
 
-export type TestResult = {
-  name: string;
-  time: number;
-  runs: number;
-  samples: number[];
-  opsPerSecond?: number;
-  stdDeviation?: number;
-  marginOfError?: number;
-  // TODO: Add support for GC tracking
-  // gcCount?: number;
-  // gcTime?: number;
-};
-
-export type TestResults = TestResult[];
-
-export type TestQueue<TValue = any, TReturn = any> = {
-  runs: number;
-  time: number;
-  name: string;
-  fn: TestFunction<TValue, TReturn>;
-  samples: number[];
-  // gcCount: number;
-  // gcTime: number;
-}[];
-
 export type TestFunction<V = any, R = any> = (value: V) => R | Promise<R>;
 
 export type TestFunctions<V = any, R = any> = {
   name: string;
   fn: TestFunction<V, R>;
+}[];
+
+export interface TestResult {
+  name: string;
+  time: number;
+  samples: number[];
+  meanTime?: number;
+  opsPerSecond?: number;
+  stdDeviation?: number;
+  marginOfError?: number;
+}
+
+export type TestResults = TestResult[];
+
+export type TestQueue<V = any, R = any> = {
+  runs: number;
+  fn: TestFunction<V, R>;
+  result: TestResult;
 }[];
 
 export class Benchmark<TValue = any, TReturn = any> {
@@ -162,7 +155,7 @@ export class Benchmark<TValue = any, TReturn = any> {
   ) {
     if (verbosity > 0) {
       Logger.pending(
-        `Preheating ${this.tests.length} tests in ${this.name} ${iterations} times each...`,
+        `${this.name}: Preheating ${this.tests.length} tests ${iterations} times each...`,
       );
     }
     return this.run(iterations, {
@@ -191,22 +184,22 @@ export class Benchmark<TValue = any, TReturn = any> {
       value,
       verbosity = 1,
     } = options || {};
-
-    // Check GC availability
     const hasGC = !!globalThis.gc;
-    if (!hasGC && gcStrategy !== 'never' && verbosity > 0) {
-      Logger.warn('No GC hook! Consider running with --expose-gc');
-    }
+    let iterationCount = 0;
 
     // Show overall benchmark info once
     if (verbosity > 0) {
+      if (!hasGC && gcStrategy !== 'never') {
+        Logger.warn('No GC hook! Consider running with --expose-gc');
+      }
       Logger.group(
         `${this.name}${name ? `${Logger.text.dim(' - ')}${name}` : ''}${
           cycles > 1 ? Logger.text.dim(` (${cycles} cycles)`) : ''
         }`,
-      );
-      Logger.pending(
-        `Running ${this.tests.length} tests ${iterations} times each...`,
+      ).pending(
+        `Running ${cycles} ${cycles > 1 ? 'cycles' : 'cycle'} of ${this.tests.length} ${
+          this.tests.length > 1 ? 'tests' : 'test'
+        } ${iterations} times each...`,
       );
       if (verbosity > 1) {
         Logger.log(
@@ -214,29 +207,39 @@ export class Benchmark<TValue = any, TReturn = any> {
             gcStrategy === 'periodic' ? ` (every ${gcInterval} iterations)` : ''
           }`,
         );
-      }
-      if (value !== undefined && verbosity > 1) {
-        Logger.log('Value:', value);
+        if (value !== undefined) {
+          Logger.log('Value:', value);
+        }
       }
     }
 
+    this.results = this.tests.map(({ name }) => ({
+      name,
+      time: 0,
+      samples: [],
+    }));
+
     // Run multiple cycles
-    for (let cycle = 0; cycle < cycles; cycle++) {
+    for (let cycle = 1; cycle <= cycles; cycle++) {
       if (verbosity > 0 && cycles > 1) {
-        Logger.log(`Cycle ${cycle + 1}/${cycles}`);
+        Logger.log(`Cycle ${cycle}/${cycles}`);
       }
 
       // Force GC before each cycle if strategy allows
       if (hasGC && gcStrategy === 'per-cycle') {
-        globalThis.gc!();
+        globalThis.gc?.();
       }
 
-      const queue = this.#prepareQueue();
-      let iterationCount = 0;
+      const queue: TestQueue = this.results.map((result, i) => ({
+        result,
+        runs: 0,
+        fn: this.tests[i].fn,
+      }));
 
       try {
         while (queue.length) {
           const { i, test, clonedValue } = this.#prepareIteration(queue, value);
+
           const runStart = performance.now();
           const result = await test.fn(clonedValue);
           const runTime = performance.now() - runStart;
@@ -266,8 +269,8 @@ export class Benchmark<TValue = any, TReturn = any> {
           }
         }
       } catch (error) {
-        this.#handleRunError(error);
-        break; // Stop cycles on error
+        Logger.group().error(`${this.name} failed:`, error).groupEnd();
+        return this;
       }
     }
 
@@ -292,7 +295,7 @@ export class Benchmark<TValue = any, TReturn = any> {
           decimals,
           trailingZeros: true,
         });
-      } catch (e) {
+      } catch (_) {
         return value.toFixed(decimals);
       }
     };
@@ -304,9 +307,9 @@ export class Benchmark<TValue = any, TReturn = any> {
           totalTime += test.time;
 
           const result: Record<string, string | number> = {
-            Runs: safeFormat(test.runs, 0),
+            Runs: safeFormat(test.samples.length, 0),
             'Total Time (ms)': safeFormat(test.time, 4),
-            'AVG Time (ms)': safeFormat(test.time / test.runs),
+            'AVG Time (ms)': safeFormat(test.time / test.samples.length),
           };
 
           // Add enhanced statistics if available
@@ -314,11 +317,10 @@ export class Benchmark<TValue = any, TReturn = any> {
             result['Ops/Sec'] = safeFormat(test.opsPerSecond, 0);
           }
 
-          if (test.marginOfError) {
+          if (test.meanTime && test.marginOfError) {
             // Also show as percentage of mean
-            const meanTime = test.time / test.runs;
             result['± (%)'] = `${safeFormat(
-              (test.marginOfError / meanTime) * 100,
+              (test.marginOfError / test.meanTime) * 100,
               2,
             )}%`;
           }
@@ -333,9 +335,7 @@ export class Benchmark<TValue = any, TReturn = any> {
     );
 
     Logger.table(resultData);
-    Logger.info(
-      Logger.text.italic(`Total time: ${safeFormat(totalTime)} ms\n`),
-    );
+    Logger.italic.info(`Total time: ${safeFormat(totalTime)} ms\n`);
   }
 
   /**
@@ -346,13 +346,14 @@ export class Benchmark<TValue = any, TReturn = any> {
       if (!result.samples || !result.samples.length) continue;
 
       // Calculate ops per second
-      const mean = result.time / result.runs;
-      result.opsPerSecond = 1000 / mean;
+      const meanTime = result.time / result.samples.length;
+      result.meanTime = meanTime;
+      result.opsPerSecond = 1000 / meanTime;
 
       // Calculate standard deviation
       const variance =
         result.samples.reduce((acc: number, time: number) => {
-          const diff = time - mean;
+          const diff = time - meanTime;
           return acc + diff * diff;
         }, 0) / result.samples.length;
       result.stdDeviation = Math.sqrt(variance);
@@ -365,25 +366,13 @@ export class Benchmark<TValue = any, TReturn = any> {
     }
   }
 
-  #prepareQueue(): TestQueue<TValue, TReturn> {
-    const queue = this.tests.map((test) => ({
-      ...test,
-      runs: 0,
-      time: 0,
-      samples: [],
-      gcCount: 0,
-      gcTime: 0,
-    }));
-    this.results = queue.slice();
-    return queue;
-  }
-
   #prepareIteration(queue: TestQueue, value: unknown) {
     const i = Math.floor(Math.random() * queue.length);
     return {
       i,
       test: queue[i]!,
-      clonedValue: structuredClone(value) as TValue,
+      clonedValue:
+        value && typeof value === 'object' ? structuredClone(value) : value,
     };
   }
 
@@ -403,8 +392,8 @@ export class Benchmark<TValue = any, TReturn = any> {
     options?: RunOptions;
   }): boolean {
     const test = queue[i]!;
-    test.time += runTime;
-    test.samples.push(runTime);
+    test.result.time += runTime;
+    test.result.samples.push(runTime);
     const testCompleted = ++test.runs === iterations;
     if (testCompleted) queue.splice(i, 1);
     if (validate) {
@@ -435,23 +424,15 @@ export class Benchmark<TValue = any, TReturn = any> {
         break;
       case 'per-test':
         if (testCompleted) {
-          globalThis.gc!();
+          globalThis.gc?.();
         }
         break;
       case 'periodic':
         if (iterationCount % gcInterval === 0) {
-          globalThis.gc!();
+          globalThis.gc?.();
         }
         break;
     }
-  }
-
-  #handleRunError(error: unknown) {
-    Logger.group();
-    Logger.error(`${this.name} failed:`, error);
-    Logger.groupEnd();
-    this.results = [];
-    return this;
   }
 
   /**
@@ -461,17 +442,11 @@ export class Benchmark<TValue = any, TReturn = any> {
   exportToJson(filePath: string): this {
     const data = {
       name: this.name,
-      results: this.results.map((result) => ({
-        name: result.name,
-        samples: result.samples,
-        mean: result.time / result.runs,
-        stdDev: result.stdDeviation || 0,
-        marginOfError: result.marginOfError || 0,
-      })),
+      results: this.results,
     };
 
     // Write the JSON file
-    writeFileSync(filePath, JSON.stringify(data, null, 2));
+    writeFileSync(filePath, JSON.stringify(data));
     Logger.success(`Benchmark data exported to ${filePath}`);
 
     return this;
