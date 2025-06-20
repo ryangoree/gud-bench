@@ -23,20 +23,17 @@ export default command({
       type: 'array',
       required: true,
     },
-
     runs: {
       alias: ['r'],
       description: 'Number of runs for the benchmark',
       type: 'number',
       default: 1e5,
     },
-
     coolDown: {
       alias: ['c'],
       description: 'Cool down time between runs in MS',
       type: 'number',
     },
-
     cycles: {
       alias: ['cy'],
       description:
@@ -44,20 +41,17 @@ export default command({
       type: 'number',
       default: 1,
     },
-
     preheat: {
       alias: ['p'],
       description: 'Number of preheat iterations',
       type: 'number',
       default: 1e3,
     },
-
     name: {
       alias: ['n'],
       description: 'Custom name for the benchmark suite',
       type: 'string',
     },
-
     verbosity: {
       alias: ['v'],
       description: 'Verbosity level (0=silent, 1=basic, 2=detailed)',
@@ -66,14 +60,12 @@ export default command({
       choices: [0, 1, 2],
       default: 1,
     },
-
     export: {
       alias: ['e'],
       description: 'Export benchmark results to JSON',
       type: 'boolean',
       default: false,
     },
-
     gcStrategy: {
       alias: ['gc'],
       description: 'Garbage collection strategy',
@@ -82,7 +74,6 @@ export default command({
       choices: ['never', 'per-cycle', 'per-test', 'periodic'],
       default: 'periodic',
     },
-
     gcInterval: {
       alias: ['gci'],
       description:
@@ -134,31 +125,35 @@ export default command({
         if (typeof moduleExports.default === 'function') {
           bench.test(fileName, moduleExports.default);
           continue;
-        } else if (typeof moduleExports.benchmark === 'function') {
+        }
+        if (typeof moduleExports.benchmark === 'function') {
           bench.test(fileName, moduleExports.benchmark);
           continue;
-        } else if (typeof moduleExports.test === 'function') {
+        }
+        if (typeof moduleExports.test === 'function') {
           bench.test(fileName, moduleExports.test);
           continue;
-        } else if (typeof moduleExports === 'function') {
+        }
+        if (typeof moduleExports === 'function') {
           bench.test(fileName, moduleExports);
           continue;
-        } else {
-          // Look for any exported function
-          let didFindFunction = false;
-          for (const [key, value] of Object.entries(moduleExports)) {
-            if (typeof value === 'function') {
-              didFindFunction = true;
-              bench.test(
-                `${fileName}${Formatter.dim('#')}${key}`,
-                value as TestFunction,
-              );
-            }
+        }
+
+        // Look for any exported function
+        let didFindFunction = false;
+        for (const [key, value] of Object.entries(moduleExports)) {
+          if (typeof value === 'function') {
+            didFindFunction = true;
+            bench.test(
+              `${fileName}${Formatter.dim('#')}${key}`,
+              value as TestFunction,
+            );
           }
-          if (!didFindFunction) {
-            throw new Error(`No function found to benchmark in ${filePath}
+        }
+
+        if (!didFindFunction) {
+          throw new Error(`No functions found to benchmark
   Expected: export default function, export { benchmark }, export { test }, or any named function export`);
-          }
         }
       } catch (error) {
         throw new Error(`Error loading ${filePath}: ${error}`);

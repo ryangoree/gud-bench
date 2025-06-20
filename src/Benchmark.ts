@@ -318,7 +318,6 @@ export class Benchmark<TValue = any, TReturn = any> {
           }
 
           if (test.meanTime && test.marginOfError) {
-            // Also show as percentage of mean
             result['± (%)'] = `${safeFormat(
               (test.marginOfError / test.meanTime) * 100,
               2,
@@ -434,7 +433,7 @@ export class Benchmark<TValue = any, TReturn = any> {
     for (const result of this.results) {
       const sampleSize = result.samples.length;
 
-      if (!sampleSize) return;
+      if (!sampleSize) continue;
 
       // Calculate ops per second
       const meanTime = result.totalTime / sampleSize;
