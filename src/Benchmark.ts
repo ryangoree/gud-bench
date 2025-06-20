@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { parseFixed } from '@gud/math';
-import { Logger } from './utils/Logger.js';
+import { Formatter, Logger } from './utils/Logger.js';
 
 type ValueOption<V> = {
   /**
@@ -193,8 +193,8 @@ export class Benchmark<TValue = any, TReturn = any> {
         Logger.warn('No GC hook! Consider running with --expose-gc');
       }
       Logger.group(
-        `${this.name}${name ? `${Logger.text.dim(' - ')}${name}` : ''}${
-          cycles > 1 ? Logger.text.dim(` (${cycles} cycles)`) : ''
+        `${this.name}${name ? `${Formatter.dim(' - ')}${name}` : ''}${
+          cycles > 1 ? Formatter.dim(` (${cycles} cycles)`) : ''
         }`,
       ).pending(
         `Running ${cycles} ${cycles > 1 ? 'cycles' : 'cycle'} of ${this.tests.length} ${
@@ -325,9 +325,11 @@ export class Benchmark<TValue = any, TReturn = any> {
           }
 
           return [
-            `${i + 1} ${Logger.text.dim('-')} ${Logger.text.bold(test.name)}${
-              i === 0 ? ' 🏆' : ''
-            }`,
+            this.results.length > 1
+              ? `${i + 1} ${Formatter.dim('-')} ${Formatter.bold(test.name)}${
+                  i === 0 ? ' 🏆' : ''
+                }`
+              : Formatter.bold(test.name),
             result,
           ];
         }),

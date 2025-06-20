@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { basename, extname, resolve } from 'node:path';
 import { command } from 'clide-js';
 import { benchmark, type RunOptions, type TestFunction } from '../Benchmark.js';
-import { Logger } from '../utils/Logger.js';
+import { Formatter, Logger } from '../utils/Logger.js';
 import { loadModule } from '../utils/loadModule.js';
 
 // Extend clide-js types for our custom GC strategy option
@@ -150,7 +150,7 @@ export default command({
             if (typeof value === 'function') {
               didFindFunction = true;
               bench.test(
-                `${fileName}${Logger.text.dim('#')}${key}`,
+                `${fileName}${Formatter.dim('#')}${key}`,
                 value as TestFunction,
               );
             }

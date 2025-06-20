@@ -8,7 +8,7 @@ import readlinePromises from 'node:readline/promises';
 // - Control Sequence Introducer (CSI) = `[`
 // - Ps Values (Attribute numbers) = `31`, `32`, etc.
 //
-// Example: '\x1b[31;4mHello\x1b[0m' formats "Hello" in underlined red.
+// Example: '\x1b[4;31mHello\x1b[0m' formats "Hello" in underlined (4) red (31).
 
 const ESC = '\x1b';
 const CSI = '[';
@@ -29,6 +29,8 @@ const SGR = {
   STRIKETHROUGH: '9',
   RESET_STRIKETHROUGH: '29',
 
+  // 3-bit mask for foreground colors, in blue-green-red order
+  // e.g., 6 = 110 = blue + green, no red
   RED: '31',
   GREEN: '32',
   YELLOW: '33',
@@ -63,7 +65,7 @@ const ANSI = {
   RESET_STRIKETHROUGH: `${ESC}${CSI}${SGR.RESET_STRIKETHROUGH}m`,
 } as const;
 
-function format(styles: SgrStyle[], ...text: unknown[]): string {
+function formatText(styles: SgrStyle[], ...text: unknown[]): string {
   return `${ESC}${CSI}${styles.join(';')}m${text.join(' ')}${ANSI.RESET}`;
 }
 
@@ -141,11 +143,23 @@ export interface TextFormatter {
 }
 
 function createTextFormatter(styles: SgrStyle[] = []): TextFormatter {
-  function textBuilder(...text: unknown[]): string {
-    return format(styles, ...text);
+  function builder(...text: unknown[]): string {
+    return formatText(styles, ...text);
   }
 
-  Object.defineProperties(textBuilder, {
+  Object.defineProperties(builder, {
+    [Symbol.toPrimitive]: {
+      value: () => formatText(styles, 'TextFormatter'),
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    },
+    name: {
+      value: 'TextFormatter',
+      enumerable: false,
+      writable: false,
+      configurable: true,
+    },
     red: {
       get() {
         return createTextFormatter([...styles, SGR.RED]);
@@ -232,7 +246,22 @@ function createTextFormatter(styles: SgrStyle[] = []): TextFormatter {
     },
   });
 
-  return textBuilder as any;
+  Object.defineProperties(builder.prototype, {
+    constructor: {
+      value: builder,
+      enumerable: false,
+      writable: true,
+      configurable: true,
+    },
+    [Symbol.toStringTag]: {
+      value: builder.name,
+      enumerable: false,
+      writable: true,
+      configurable: true,
+    },
+  });
+
+  return builder as any;
 }
 
 export const Formatter: TextFormatter = createTextFormatter();
@@ -261,11 +290,6 @@ export interface Logger {
   (...text: unknown[]): Logger;
 
   readonly ANSI: typeof ANSI;
-
-  /**
-   * Creates a text formatter that returns formatted strings instead of logging.
-   */
-  text: TextFormatter;
 
   // Colors //
 
@@ -394,26 +418,19 @@ export interface Logger {
 
 function createLogger(styles: SgrStyle[] = []): Logger {
   function builder(...text: unknown[]) {
-    console.log(format(styles, ...text));
+    console.log(formatText(styles, ...text));
     return createLogger();
   }
 
-  Object.defineProperties(builder.prototype, {
-    constructor: {
-      value: builder,
-      enumerable: false,
-      writable: true,
-      configurable: true,
-    },
-    [Symbol.toStringTag]: {
-      value: builder.name,
-      enumerable: false,
-      writable: true,
-      configurable: true,
-    },
-  });
-
   Object.defineProperties(builder, {
+    [Symbol.toPrimitive]: {
+      value: () => {
+        return formatText(styles, 'Logger');
+      },
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    },
     name: {
       value: 'Logger',
       enumerable: false,
@@ -423,13 +440,6 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     ANSI: {
       value: ANSI,
       writable: false,
-      enumerable: true,
-      configurable: false,
-    },
-    text: {
-      get() {
-        return createTextFormatter(styles);
-      },
       enumerable: true,
       configurable: false,
     },
@@ -519,8 +529,8 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     log: {
       value(...msg: unknown[]) {
-        const prefix = format([SGR.BLUE], '✦');
-        console.log(prefix, format(styles, ...msg));
+        const prefix = formatText([SGR.BLUE], '✦');
+        console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
       writable: false,
@@ -529,8 +539,8 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     info: {
       value(...msg: unknown[]) {
-        const prefix = format([SGR.CYAN], 'ℹ');
-        console.log(prefix, format(styles, ...msg));
+        const prefix = formatText([SGR.CYAN], 'ℹ');
+        console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
       writable: false,
@@ -539,8 +549,8 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     success: {
       value(...msg: unknown[]) {
-        const prefix = format([SGR.GREEN], '✔︎');
-        console.log(prefix, format(styles, ...msg));
+        const prefix = formatText([SGR.GREEN], '✔︎');
+        console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
       writable: false,
@@ -549,8 +559,8 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     warn: {
       value(...msg: unknown[]) {
-        const prefix = format([SGR.YELLOW], '⚠︎');
-        console.log(prefix, format(styles, ...msg));
+        const prefix = formatText([SGR.YELLOW], '⚠︎');
+        console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
       writable: false,
@@ -559,8 +569,8 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     error: {
       value(...msg: unknown[]) {
-        const prefix = format([SGR.RED], '✖︎ error:');
-        console.log(prefix, format(styles, ...msg));
+        const prefix = formatText([SGR.RED], '✖︎ error:');
+        console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
       writable: false,
@@ -569,8 +579,8 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     debug: {
       value(...msg: unknown[]) {
-        const prefix = format([SGR.YELLOW], '⚙︎ debug:');
-        console.log(prefix, format(styles, ...msg));
+        const prefix = formatText([SGR.YELLOW], '⚙︎ debug:');
+        console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
       writable: false,
@@ -579,8 +589,8 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     pending: {
       value(...msg: unknown[]) {
-        const prefix = format([SGR.BLUE], '…');
-        console.log(prefix, format(styles, ...msg));
+        const prefix = formatText([SGR.BLUE], '…');
+        console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
       writable: false,
@@ -590,8 +600,8 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     group: {
       value(...label: unknown[]) {
         if (label.length) {
-          const prefix = format([SGR.CYAN], '▾');
-          console.group(prefix, format(styles, ...label));
+          const prefix = formatText([SGR.CYAN], '▾');
+          console.group(prefix, formatText(styles, ...label));
         } else {
           console.group();
         }
@@ -627,15 +637,15 @@ function createLogger(styles: SgrStyle[] = []): Logger {
           defaultValue = true,
         }: LoggerConfirmOptions = {},
       ): Promise<boolean> {
-        const prefix = format([SGR.CYAN], '? ');
+        const prefix = formatText([SGR.CYAN], '? ');
         const suffix = defaultValue
-          ? ` [${format([SGR.GREEN], 'Y')}/n]`
-          : ` [y/${format([SGR.RED], 'N')}]`;
+          ? ` [${formatText([SGR.GREEN], 'Y')}/n]`
+          : ` [y/${formatText([SGR.RED], 'N')}]`;
 
-        const formattedMsg = format(styles, msg);
+        const formattedMsg = formatText(styles, msg);
 
         const question = `${prefix}${formattedMsg}${suffix}? `;
-        const cancelPrefix = format([SGR.RED], '✖︎ ');
+        const cancelPrefix = formatText([SGR.RED], '✖︎ ');
 
         const rl = readlinePromises.createInterface({
           input: process.stdin,
@@ -676,13 +686,20 @@ function createLogger(styles: SgrStyle[] = []): Logger {
         return ask();
       },
     },
-    [Symbol.toPrimitive]: {
-      value: () => {
-        return format(styles, 'Logger');
-      },
-      writable: false,
+  });
+
+  Object.defineProperties(builder.prototype, {
+    constructor: {
+      value: builder,
       enumerable: false,
-      configurable: false,
+      writable: true,
+      configurable: true,
+    },
+    [Symbol.toStringTag]: {
+      value: builder.name,
+      enumerable: false,
+      writable: true,
+      configurable: true,
     },
   });
 

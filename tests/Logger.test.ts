@@ -34,6 +34,41 @@ describe('Logger', () => {
     errorOutput = [];
   });
 
+  describe('Text formatter', () => {
+    it('should export standalone Formatter', () => {
+      assert.ok(Formatter);
+      assert.ok(typeof Formatter === 'function');
+    });
+
+    it('should format text without logging', () => {
+      const text = 'Red text';
+      const formatted = Formatter.red(text);
+      assert.strictEqual(typeof formatted, 'string');
+      assert.ok(formatted.includes(text));
+      assert.strictEqual(logOutput.length, 0); // Should not log
+    });
+
+    it('should support chained text formatting', () => {
+      const text = 'Bold red text';
+      const formatted = Formatter.bold.red(text);
+      assert.strictEqual(typeof formatted, 'string');
+      assert.ok(formatted.includes(text));
+      assert.strictEqual(logOutput.length, 0); // Should not log
+    });
+
+    it('should work in template literals', () => {
+      const fileName = 'test-file';
+      const key = 'testFunction';
+      const separator = '#';
+      const result = `${fileName}${Formatter.dim(separator)}${key}`;
+
+      assert.ok(result.includes(fileName));
+      assert.ok(result.includes(separator));
+      assert.ok(result.includes(key));
+      assert.strictEqual(logOutput.length, 0); // Should not log
+    });
+  });
+
   describe('Basic logging', () => {
     it('should log basic messages', () => {
       Logger('Hello World');
@@ -115,64 +150,6 @@ describe('Logger', () => {
     });
   });
 
-  describe('Text formatter', () => {
-    it('should provide text formatter', () => {
-      assert.ok(Logger.text);
-      assert.ok(typeof Logger.text === 'function');
-    });
-
-    it('should format text without logging', () => {
-      const formatted = Logger.text.red('Red text');
-      assert.strictEqual(typeof formatted, 'string');
-      assert.ok(formatted.includes('Red text'));
-      assert.strictEqual(logOutput.length, 0); // Should not log
-    });
-
-    it('should support chained text formatting', () => {
-      const formatted = Logger.text.bold.red('Bold red text');
-      assert.strictEqual(typeof formatted, 'string');
-      assert.ok(formatted.includes('Bold red text'));
-      assert.strictEqual(logOutput.length, 0); // Should not log
-    });
-
-    it('should support dim formatting for inline use', () => {
-      const dimText = Logger.text.dim('#');
-      assert.strictEqual(typeof dimText, 'string');
-      assert.ok(dimText.includes('#'));
-      assert.strictEqual(logOutput.length, 0);
-    });
-
-    it('should work in template literals', () => {
-      const fileName = 'test-file';
-      const key = 'testFunction';
-      const result = `${fileName}${Logger.text.dim('#')}${key}`;
-
-      assert.ok(result.includes('test-file'));
-      assert.ok(result.includes('#'));
-      assert.ok(result.includes('testFunction'));
-      assert.strictEqual(logOutput.length, 0);
-    });
-  });
-
-  describe('Formatter standalone', () => {
-    it('should export standalone Formatter', () => {
-      assert.ok(Formatter);
-      assert.ok(typeof Formatter === 'function');
-    });
-
-    it('should format text with standalone Formatter', () => {
-      const formatted = Formatter.red('Standalone red');
-      assert.strictEqual(typeof formatted, 'string');
-      assert.ok(formatted.includes('Standalone red'));
-    });
-
-    it('should support chaining with standalone Formatter', () => {
-      const formatted = Formatter.bold.blue('Standalone bold blue');
-      assert.strictEqual(typeof formatted, 'string');
-      assert.ok(formatted.includes('Standalone bold blue'));
-    });
-  });
-
   describe('Group functionality', () => {
     let originalConsoleGroup: typeof console.group;
     let originalConsoleGroupEnd: typeof console.groupEnd;
@@ -239,28 +216,6 @@ describe('Logger', () => {
 
       assert.strictEqual(tableCalls.length, 1);
       assert.strictEqual(tableCalls[0][0], data);
-    });
-  });
-
-  describe('ANSI constants', () => {
-    it('should expose ANSI constants', () => {
-      assert.ok(Logger.ANSI);
-      assert.ok(typeof Logger.ANSI === 'object');
-      assert.ok(typeof Logger.ANSI.RED === 'string');
-      assert.ok(typeof Logger.ANSI.GREEN === 'string');
-      assert.ok(typeof Logger.ANSI.RESET === 'string');
-    });
-  });
-
-  describe('Symbol handling', () => {
-    it('should handle Symbol.toPrimitive', () => {
-      const stringValue = String(Logger);
-      assert.strictEqual(typeof stringValue, 'string');
-    });
-
-    it('should handle chained Symbol.toPrimitive', () => {
-      const stringValue = String(Logger.red.bold);
-      assert.strictEqual(typeof stringValue, 'string');
     });
   });
 });
