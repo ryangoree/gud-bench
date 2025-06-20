@@ -35,7 +35,8 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "build:watch": "tsc --watch",
-    "bench": "node --expose-gc dist/cli.js"
+    "bench": "node --expose-gc dist/cli.js",
+    "test": "node --test tests/*.test.js"
   },
   "exports": {
     ".": {
