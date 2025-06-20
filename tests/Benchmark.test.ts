@@ -82,8 +82,8 @@ describe('Benchmark', () => {
       assert.strictEqual(bench.results[1].name, 'Add');
       assert.strictEqual(bench.results[0].samples.length, 10);
       assert.strictEqual(bench.results[1].samples.length, 10);
-      assert.ok(bench.results[0].time > 0);
-      assert.ok(bench.results[1].time > 0);
+      assert.ok(bench.results[0].totalTime > 0);
+      assert.ok(bench.results[1].totalTime > 0);
       assert.ok(counter >= 10); // Should have been called at least 10 times
     });
 
@@ -99,7 +99,7 @@ describe('Benchmark', () => {
 
       assert.strictEqual(bench.results.length, 1);
       assert.strictEqual(bench.results[0].samples.length, 5);
-      assert.ok(bench.results[0].time > 0);
+      assert.ok(bench.results[0].totalTime > 0);
     });
 
     it('should respect verbosity settings', async () => {
@@ -181,7 +181,7 @@ describe('Benchmark', () => {
       await bench.run(10, { verbosity: 0 });
 
       const result = bench.results[0];
-      assert.ok(result.time > 0);
+      assert.ok(result.totalTime > 0);
       assert.strictEqual(result.samples.length, 10);
       assert.ok(result.opsPerSecond !== undefined);
       assert.ok(result.opsPerSecond > 0);
@@ -199,7 +199,7 @@ describe('Benchmark', () => {
         results: bench.results.map((result) => ({
           name: result.name,
           samples: result.samples,
-          mean: result.time / result.samples.length,
+          mean: result.totalTime / result.samples.length,
           stdDev: result.stdDeviation || 0,
           marginOfError: result.marginOfError || 0,
         })),

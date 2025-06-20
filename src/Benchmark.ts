@@ -1,5 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { parseFixed } from '@gud/math';
+import { getTCritical95 } from './utils/getTCritical95.js';
 import { Formatter, Logger } from './utils/Logger.js';
 
 type ValueOption<V> = {
@@ -457,10 +458,9 @@ export class Benchmark<TValue = any, TReturn = any> {
       result.stdDeviation = Math.sqrt(variance);
 
       // Calculate margin of error (95% confidence interval)
-      // Using t-distribution for small sample sizes would be more accurate
-      // but for simplicity we'll use normal distribution approximation
+      const criticalTValue = getTCritical95(degreesOfFreedom);
       result.marginOfError =
-        1.96 * (result.stdDeviation / Math.sqrt(sampleSize));
+        criticalTValue * (result.stdDeviation / Math.sqrt(sampleSize));
     }
   }
 }
