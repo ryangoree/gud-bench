@@ -42,7 +42,8 @@
     "lint": "biome lint --diagnostic-level error .",
     "lint:fix": "yarn lint --fix",
     "lint:fix:unsafe": "yarn lint:fix --unsafe",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "release": "changeset publish"
   },
   "exports": {
     ".": {
