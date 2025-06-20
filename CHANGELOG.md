@@ -1,5 +1,13 @@
 # @gud/bench
 
+## 1.0.3
+
+### Patch Changes
+
+- 7151b6e: Improved stats calc + general polish
+- 2698624: Switched to **sample variance** ([Bessel’s correction](https://en.wikipedia.org/wiki/Bessel%27s_correction?utm_source=chatgpt.com)) by dividing by _n – 1_ instead of _n_ when computing standard deviation.
+- e69a2c1: Switched margin-of-error calculation to use Student’s t-distribution critical values for improved accuracy on small sample sizes
+
 ## 1.0.2
 
 ### Patch Changes
