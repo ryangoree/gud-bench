@@ -84,8 +84,8 @@ export type TestFunctions<V = any, R = any> = {
 
 export interface TestResult {
   name: string;
-  time: number;
   samples: number[];
+  totalTime: number;
   meanTime?: number;
   opsPerSecond?: number;
   stdDeviation?: number;
@@ -215,8 +215,8 @@ export class Benchmark<TValue = any, TReturn = any> {
 
     this.results = this.tests.map(({ name }) => ({
       name,
-      time: 0,
       samples: [],
+      totalTime: 0,
     }));
 
     // Run multiple cycles
@@ -244,6 +244,7 @@ export class Benchmark<TValue = any, TReturn = any> {
           const result = await test.fn(clonedValue);
           const runTime = performance.now() - runStart;
 
+          iterationCount++;
           const testCompleted = this.#handleIteration({
             queue,
             i,
@@ -252,8 +253,6 @@ export class Benchmark<TValue = any, TReturn = any> {
             iterations,
             options,
           });
-
-          iterationCount++;
 
           // Handle GC based on strategy
           if (hasGC) {
@@ -302,14 +301,14 @@ export class Benchmark<TValue = any, TReturn = any> {
 
     const resultData = Object.fromEntries(
       this.results
-        .sort((a, b) => a.time - b.time)
+        .sort((a, b) => a.totalTime - b.totalTime)
         .map((test, i) => {
-          totalTime += test.time;
+          totalTime += test.totalTime;
 
           const result: Record<string, string | number> = {
             Runs: safeFormat(test.samples.length, 0),
-            'Total Time (ms)': safeFormat(test.time, 4),
-            'AVG Time (ms)': safeFormat(test.time / test.samples.length),
+            'Total Time (ms)': safeFormat(test.totalTime, 4),
+            'AVG Time (ms)': safeFormat(test.totalTime / test.samples.length),
           };
 
           // Add enhanced statistics if available
@@ -339,34 +338,24 @@ export class Benchmark<TValue = any, TReturn = any> {
   }
 
   /**
-   * Calculate statistical measures for test results
+   * Export the benchmark results to a JSON file.
+   * @param filePath - The path to save the JSON file to.
    */
-  #calculateStatistics() {
-    for (const result of this.results) {
-      if (!result.samples || !result.samples.length) continue;
+  exportToJson(filePath: string): this {
+    const data = {
+      name: this.name,
+      results: this.results,
+    };
 
-      // Calculate ops per second
-      const meanTime = result.time / result.samples.length;
-      result.meanTime = meanTime;
-      result.opsPerSecond = 1000 / meanTime;
+    // Write the JSON file
+    writeFileSync(filePath, JSON.stringify(data));
+    Logger.success(`Benchmark data exported to ${filePath}`);
 
-      // Calculate standard deviation
-      const variance =
-        result.samples.reduce((acc: number, time: number) => {
-          const diff = time - meanTime;
-          return acc + diff * diff;
-        }, 0) / result.samples.length;
-      result.stdDeviation = Math.sqrt(variance);
-
-      // Calculate margin of error (95% confidence interval)
-      // Using t-distribution for small sample sizes would be more accurate
-      // but for simplicity we'll use normal distribution approximation
-      result.marginOfError =
-        1.96 * (result.stdDeviation / Math.sqrt(result.samples.length));
-    }
+    return this;
   }
 
   #prepareIteration(queue: TestQueue, value: unknown) {
+    // Random execution order to avoid bias from JIT optimizations
     const i = Math.floor(Math.random() * queue.length);
     return {
       i,
@@ -392,7 +381,7 @@ export class Benchmark<TValue = any, TReturn = any> {
     options?: RunOptions;
   }): boolean {
     const test = queue[i]!;
-    test.result.time += runTime;
+    test.result.totalTime += runTime;
     test.result.samples.push(runTime);
     const testCompleted = ++test.runs === iterations;
     if (testCompleted) queue.splice(i, 1);
@@ -436,20 +425,41 @@ export class Benchmark<TValue = any, TReturn = any> {
   }
 
   /**
-   * Export the benchmark results to a JSON file.
-   * @param filePath - The path to save the JSON file to.
+   * Calculate statistical measures for test results
    */
-  exportToJson(filePath: string): this {
-    const data = {
-      name: this.name,
-      results: this.results,
-    };
+  #calculateStatistics() {
+    for (const result of this.results) {
+      const sampleSize = result.samples.length;
 
-    // Write the JSON file
-    writeFileSync(filePath, JSON.stringify(data));
-    Logger.success(`Benchmark data exported to ${filePath}`);
+      if (!sampleSize) return;
 
-    return this;
+      // Calculate ops per second
+      const meanTime = result.totalTime / sampleSize;
+      result.meanTime = meanTime;
+      result.opsPerSecond = 1000 / meanTime;
+
+      if (sampleSize <= 1) continue;
+
+      // Adjusted sample size (n − 1) for Bessel’s correction
+      // see:
+      // - https://en.wikipedia.org/wiki/Bessel%27s_correction
+      // - https://en.wikipedia.org/wiki/Standard_deviation#Sample_standard_deviation
+      const degreesOfFreedom = sampleSize - 1;
+
+      // Calculate standard deviation
+      const variance =
+        result.samples.reduce((acc: number, time: number) => {
+          const diff = time - meanTime;
+          return acc + diff * diff;
+        }, 0) / degreesOfFreedom;
+      result.stdDeviation = Math.sqrt(variance);
+
+      // Calculate margin of error (95% confidence interval)
+      // Using t-distribution for small sample sizes would be more accurate
+      // but for simplicity we'll use normal distribution approximation
+      result.marginOfError =
+        1.96 * (result.stdDeviation / Math.sqrt(sampleSize));
+    }
   }
 }
 
