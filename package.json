@@ -40,8 +40,8 @@
     "test": "tsx --test tests/*.test.ts",
     "format": "biome format --write",
     "lint": "biome lint --diagnostic-level error .",
-    "lint:fix": "yarn lint --fix",
-    "lint:fix:unsafe": "yarn lint:fix --unsafe",
+    "lint:fix": "npm:lint --fix",
+    "lint:fix:unsafe": "npm:lint:fix --unsafe",
     "typecheck": "tsc --noEmit",
     "release": "changeset publish"
   },
