@@ -27,23 +27,23 @@ npm install @gud/bench
 
 ### Running Arbitrary Files with the CLI
 
-The easiest way to benchmark any JavaScript files is using the `run` command:
+The easiest way to benchmark any JavaScript files is using the CLI:
 
 ```bash
 # Benchmark a single file
-bench run --files my-functions.js
+bench --files my-functions.js
 
 # Benchmark multiple files  
-bench run --files file1.js file2.js file3.js
+bench --files file1.js file2.js file3.js
 
 # Customize the benchmark parameters
-bench run --files my-functions.js --runs 50000 --cycles 3
+bench --files my-functions.js --runs 50000 --cycles 3
 
 # Export results to JSON
-bench run --files my-functions.js --export true
+bench --files my-functions.js --export true
 ```
 
-The `run` command will automatically detect and benchmark:
+The CLI will automatically detect and benchmark:
 - Default exports (`export default function`)
 - Named function exports (`export function myFunction()`)
 - Specific benchmark functions (`export { benchmark }` or `export { test }`)
@@ -154,7 +154,7 @@ await bench.run(50000, {
 **TypeScript Support:**
 ```ts
 // Works seamlessly with TypeScript files
-bench run --files "src/**/*.ts" --runs 10000
+bench --files "src/**/*.ts" --runs 10000
 ```
 
 ## API Reference
