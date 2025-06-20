@@ -1,5 +1,11 @@
 # @gud/bench
 
+## 1.0.2
+
+### Patch Changes
+
+- 67ec84c: Removed unused dependency
+
 ## 1.0.1
 
 ### Patch Changes
