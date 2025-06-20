@@ -20,6 +20,7 @@
 
 ```sh
 npm install --global @gud/bench
+
 # or, for local projects
 npm install --save-dev @gud/bench
 ```
