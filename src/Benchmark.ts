@@ -42,7 +42,7 @@ export type RunOptions<V = any, R = any> = {
   /**
    * Garbage collection strategy.
    * - `'never'` - Never force GC (fastest, but may have memory pressure effects)
-   * - `'per-cycle'` - Force GC once per cycle (default, good balance)
+   * - `'per-cycle'` - Force GC once per cycle (good balance)
    * - `'per-test'` - Force GC when each test completes all iterations
    * - `'periodic'` - Force GC every N iterations (use with gcInterval)
    *
