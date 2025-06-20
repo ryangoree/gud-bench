@@ -197,4 +197,4 @@ interface RunOptions {
 - `'per-test'` - GC after each test completes all iterations
 - `'periodic'` - GC every N iterations (configurable via `gcInterval`)
 
-**Note:** Requires `--expose-gc` flag for actual garbage collection.
+**Note:** The CLI automatically restarts with the `--expose-gc` flag when needed for garbage collection. To disable this behavior, set the environment variable `BENCH_NO_EXPOSE_GC=true`.
