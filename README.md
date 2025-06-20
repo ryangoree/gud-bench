@@ -10,7 +10,6 @@
 
 - 🚀 **Zero-config benchmarking** - Just point it at your functions
 - 📊 **Statistical accuracy** with multiple cycles and margin of error calculation
-- 🎨 **Beautiful console output** with colored formatting and tables
 - 🔧 **TypeScript support** - Transpiles `.ts` files on-the-fly
 - ⚡ **Multiple export patterns** - Detects default, named, and benchmark exports
 - 🗑️ **Memory management** - Advanced garbage collection strategies
