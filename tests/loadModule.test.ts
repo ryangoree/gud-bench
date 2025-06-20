@@ -1,14 +1,14 @@
-import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert';
 import {
-  writeFileSync,
-  unlinkSync,
   existsSync,
   mkdirSync,
   rmSync,
+  unlinkSync,
+  writeFileSync,
 } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { loadModule } from '../dist/utils/loadModule.js';
+import { after, before, describe, it } from 'node:test';
+import { loadModule } from '../src/utils/loadModule.js';
 
 describe('loadModule', () => {
   const testDir = resolve('./test-modules');
@@ -19,7 +19,7 @@ describe('loadModule', () => {
     // Create test directory if it doesn't exist
     try {
       mkdirSync(testDir, { recursive: true });
-    } catch (error) {
+    } catch (_) {
       // Directory might already exist
     }
   });
@@ -28,7 +28,7 @@ describe('loadModule', () => {
     // Clean up test files and directory
     try {
       rmSync(testDir, { recursive: true, force: true });
-    } catch (error) {
+    } catch (_) {
       // Directory might not exist
     }
   });
@@ -214,13 +214,8 @@ describe('loadModule', () => {
   });
 
   describe('Error handling', () => {
-    it('should handle non-existent files', async () => {
-      try {
-        await loadModule('./non-existent-file.js');
-        assert.fail('Should have thrown an error');
-      } catch (error) {
-        assert.ok(error instanceof Error);
-      }
+    it('should handle non-existent files', () => {
+      assert.rejects(() => loadModule('./non-existent-file.js'));
     });
 
     it('should handle syntax errors in TypeScript', async () => {

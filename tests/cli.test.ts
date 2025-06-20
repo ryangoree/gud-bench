@@ -1,12 +1,12 @@
-import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert';
 import { spawn } from 'node:child_process';
-import { writeFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { after, before, describe, it } from 'node:test';
 
 describe('CLI Integration', () => {
   const testDir = './test-cli-files';
-  const cliPath = './dist/cli.js';
+  const cliPath = './src/cli.js';
 
   before(() => {
     // Create test directory
@@ -22,9 +22,16 @@ describe('CLI Integration', () => {
     }
   });
 
-  function runCLI(args, options = {}) {
+  function runCLI(
+    args,
+    options = {},
+  ): Promise<{
+    code: number | null;
+    stdout: string;
+    stderr: string;
+  }> {
     return new Promise((resolve, reject) => {
-      const child = spawn('node', [cliPath, ...args], {
+      const child = spawn('bun', [cliPath, ...args], {
         stdio: 'pipe',
         cwd: process.cwd(),
         ...options,
@@ -41,13 +48,13 @@ describe('CLI Integration', () => {
         stderr += data.toString();
       });
 
-      child.on('close', (code) => {
-        resolve({ code, stdout, stderr });
-      });
-
-      child.on('error', (error) => {
-        reject(error);
-      });
+      child
+        .on('close', (code) => {
+          resolve({ code, stdout, stderr });
+        })
+        .on('error', (error) => {
+          reject(error);
+        });
 
       // Timeout after 10 seconds
       setTimeout(() => {

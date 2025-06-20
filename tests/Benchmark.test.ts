@@ -1,6 +1,6 @@
-import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { Benchmark, benchmark } from '../dist/Benchmark.js';
+import { describe, it } from 'node:test';
+import { Benchmark, benchmark } from '../src/Benchmark.js';
 
 describe('Benchmark', () => {
   describe('Constructor and basic functionality', () => {

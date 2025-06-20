@@ -1,12 +1,12 @@
-import { describe, it, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert';
-import { Logger, Formatter } from '../dist/utils/Logger.js';
+import { after, before, beforeEach, describe, it } from 'node:test';
+import { Formatter, Logger } from '../src/utils/Logger.js';
 
 describe('Logger', () => {
-  let originalConsoleLog;
-  let originalConsoleError;
-  let logOutput = [];
-  let errorOutput = [];
+  let originalConsoleLog: typeof console.log;
+  let originalConsoleError: typeof console.error;
+  let logOutput: string[] = [];
+  let errorOutput: string[] = [];
 
   before(() => {
     // Capture console output for testing
@@ -174,9 +174,9 @@ describe('Logger', () => {
   });
 
   describe('Group functionality', () => {
-    let originalConsoleGroup;
-    let originalConsoleGroupEnd;
-    let groupCalls = [];
+    let originalConsoleGroup: typeof console.group;
+    let originalConsoleGroupEnd: typeof console.groupEnd;
+    let groupCalls: [string, ...unknown[]][] = [];
 
     before(() => {
       originalConsoleGroup = console.group;
@@ -211,8 +211,8 @@ describe('Logger', () => {
   });
 
   describe('Table functionality', () => {
-    let originalConsoleTable;
-    let tableCalls = [];
+    let originalConsoleTable: typeof console.table;
+    let tableCalls: unknown[][] = [];
 
     before(() => {
       originalConsoleTable = console.table;

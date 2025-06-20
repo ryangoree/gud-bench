@@ -31,13 +31,14 @@
     "@biomejs/biome": "^2.0.0",
     "@changesets/cli": "^2.29.4",
     "@types/node": "^24.0.3",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   },
   "scripts": {
     "build": "rm -rf dist && tsc",
     "build:watch": "tsc --watch",
-    "bench": "node --expose-gc dist/cli.js",
-    "test": "node --test tests/*.test.js",
+    "bench": "node dist/cli.js",
+    "test": "tsx --test tests/*.test.ts",
     "format": "biome format --write",
     "lint": "biome lint --diagnostic-level error .",
     "lint:fix": "yarn lint --fix",
