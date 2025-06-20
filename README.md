@@ -190,8 +190,8 @@ interface RunOptions {
 ### Garbage Collection Strategies
 
 - `'never'` - No forced GC (fastest, but memory pressure may affect results)
-- `'per-cycle'` - GC once per cycle (good balance, default)
+- `'per-cycle'` - GC once per cycle (good balance)
 - `'per-test'` - GC after each test completes all iterations
-- `'periodic'` - GC every N iterations (configurable via `gcInterval`)
+- `'periodic'` - GC every N iterations (default, configurable via `gcInterval`)
 
 **Note:** The CLI automatically restarts with the `--expose-gc` flag when needed for garbage collection. To disable this behavior, set the environment variable `BENCH_NO_EXPOSE_GC=true`.
