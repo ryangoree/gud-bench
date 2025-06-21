@@ -143,125 +143,90 @@ export interface TextFormatter {
 }
 
 function createTextFormatter(styles: SgrStyle[] = []): TextFormatter {
-  function builder(...text: unknown[]): string {
+  function TextFormatter(...text: unknown[]): string {
     return formatText(styles, ...text);
   }
 
-  Object.defineProperties(builder, {
+  Object.defineProperties(TextFormatter, {
     [Symbol.toPrimitive]: {
-      value: () => formatText(styles, 'TextFormatter'),
+      value() {
+        return formatText(styles, this.name);
+      },
       writable: false,
       enumerable: false,
       configurable: false,
     },
-    name: {
-      value: 'TextFormatter',
-      enumerable: false,
+    toString: {
+      value() {
+        return formatText(styles, this.name);
+      },
       writable: false,
+      enumerable: false,
       configurable: true,
     },
     red: {
-      get() {
-        return createTextFormatter([...styles, SGR.RED]);
-      },
+      get: () => createTextFormatter([...styles, SGR.RED]),
       enumerable: true,
       configurable: false,
     },
     green: {
-      get() {
-        return createTextFormatter([...styles, SGR.GREEN]);
-      },
+      get: () => createTextFormatter([...styles, SGR.GREEN]),
       enumerable: true,
       configurable: false,
     },
     yellow: {
-      get() {
-        return createTextFormatter([...styles, SGR.YELLOW]);
-      },
+      get: () => createTextFormatter([...styles, SGR.YELLOW]),
       enumerable: true,
       configurable: false,
     },
     blue: {
-      get() {
-        return createTextFormatter([...styles, SGR.BLUE]);
-      },
+      get: () => createTextFormatter([...styles, SGR.BLUE]),
       enumerable: true,
       configurable: false,
     },
     magenta: {
-      get() {
-        return createTextFormatter([...styles, SGR.MAGENTA]);
-      },
+      get: () => createTextFormatter([...styles, SGR.MAGENTA]),
       enumerable: true,
       configurable: false,
     },
     cyan: {
-      get() {
-        return createTextFormatter([...styles, SGR.CYAN]);
-      },
+      get: () => createTextFormatter([...styles, SGR.CYAN]),
       enumerable: true,
       configurable: false,
     },
     white: {
-      get() {
-        return createTextFormatter([...styles, SGR.WHITE]);
-      },
+      get: () => createTextFormatter([...styles, SGR.WHITE]),
       enumerable: true,
       configurable: false,
     },
     bold: {
-      get() {
-        return createTextFormatter([...styles, SGR.BOLD]);
-      },
+      get: () => createTextFormatter([...styles, SGR.BOLD]),
       enumerable: true,
       configurable: false,
     },
     dim: {
-      get() {
-        return createTextFormatter([...styles, SGR.DIM]);
-      },
+      get: () => createTextFormatter([...styles, SGR.DIM]),
       enumerable: true,
       configurable: false,
     },
     italic: {
-      get() {
-        return createTextFormatter([...styles, SGR.ITALIC]);
-      },
+      get: () => createTextFormatter([...styles, SGR.ITALIC]),
       enumerable: true,
       configurable: false,
     },
     underline: {
-      get() {
-        return createTextFormatter([...styles, SGR.UNDERLINE]);
-      },
+      get: () => createTextFormatter([...styles, SGR.UNDERLINE]),
       enumerable: true,
       configurable: false,
     },
     strikethrough: {
-      get() {
-        return createTextFormatter([...styles, SGR.STRIKETHROUGH]);
-      },
+      get: () => createTextFormatter([...styles, SGR.STRIKETHROUGH]),
       enumerable: true,
       configurable: false,
     },
   });
 
-  Object.defineProperties(builder.prototype, {
-    constructor: {
-      value: builder,
-      enumerable: false,
-      writable: true,
-      configurable: true,
-    },
-    [Symbol.toStringTag]: {
-      value: builder.name,
-      enumerable: false,
-      writable: true,
-      configurable: true,
-    },
-  });
-
-  return builder as any;
+  return TextFormatter as any;
 }
 
 export const Formatter: TextFormatter = createTextFormatter();
@@ -417,24 +382,26 @@ export interface Logger {
 }
 
 function createLogger(styles: SgrStyle[] = []): Logger {
-  function builder(...text: unknown[]) {
+  function Logger(...text: unknown[]) {
     console.log(formatText(styles, ...text));
     return createLogger();
   }
 
-  Object.defineProperties(builder, {
+  Object.defineProperties(Logger, {
     [Symbol.toPrimitive]: {
-      value: () => {
-        return formatText(styles, 'Logger');
+      value() {
+        return formatText(styles, this.name);
       },
       writable: false,
       enumerable: false,
       configurable: false,
     },
-    name: {
-      value: 'Logger',
-      enumerable: false,
+    toString: {
+      value() {
+        return formatText(styles, this.name);
+      },
       writable: false,
+      enumerable: false,
       configurable: true,
     },
     ANSI: {
@@ -444,86 +411,62 @@ function createLogger(styles: SgrStyle[] = []): Logger {
       configurable: false,
     },
     red: {
-      get() {
-        return createLogger([...styles, SGR.RED]);
-      },
+      get: () => createLogger([...styles, SGR.RED]),
       enumerable: true,
       configurable: false,
     },
     green: {
-      get() {
-        return createLogger([...styles, SGR.GREEN]);
-      },
+      get: () => createLogger([...styles, SGR.GREEN]),
       enumerable: true,
       configurable: false,
     },
     yellow: {
-      get() {
-        return createLogger([...styles, SGR.YELLOW]);
-      },
+      get: () => createLogger([...styles, SGR.YELLOW]),
       enumerable: true,
       configurable: false,
     },
     blue: {
-      get() {
-        return createLogger([...styles, SGR.BLUE]);
-      },
+      get: () => createLogger([...styles, SGR.BLUE]),
       enumerable: true,
       configurable: false,
     },
     magenta: {
-      get() {
-        return createLogger([...styles, SGR.MAGENTA]);
-      },
+      get: () => createLogger([...styles, SGR.MAGENTA]),
       enumerable: true,
       configurable: false,
     },
     cyan: {
-      get() {
-        return createLogger([...styles, SGR.CYAN]);
-      },
+      get: () => createLogger([...styles, SGR.CYAN]),
       enumerable: true,
       configurable: false,
     },
     white: {
-      get() {
-        return createLogger([...styles, SGR.WHITE]);
-      },
+      get: () => createLogger([...styles, SGR.WHITE]),
       enumerable: true,
       configurable: false,
     },
     bold: {
-      get() {
-        return createLogger([...styles, SGR.BOLD]);
-      },
+      get: () => createLogger([...styles, SGR.BOLD]),
       enumerable: true,
       configurable: false,
     },
     dim: {
-      get() {
-        return createLogger([...styles, SGR.DIM]);
-      },
+      get: () => createLogger([...styles, SGR.DIM]),
       enumerable: true,
       configurable: false,
     },
     italic: {
-      get() {
-        return createLogger([...styles, SGR.ITALIC]);
-      },
+      get: () => createLogger([...styles, SGR.ITALIC]),
       enumerable: true,
       configurable: false,
     },
     underline: {
-      get() {
-        return createLogger([...styles, SGR.UNDERLINE]);
-      },
+      get: () => createLogger([...styles, SGR.UNDERLINE]),
       enumerable: true,
       configurable: false,
     },
     strikethrough: {
-      get() {
-        return createLogger([...styles, SGR.STRIKETHROUGH]);
-      },
+      get: () => createLogger([...styles, SGR.STRIKETHROUGH]),
       enumerable: true,
       configurable: false,
     },
@@ -688,22 +631,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
   });
 
-  Object.defineProperties(builder.prototype, {
-    constructor: {
-      value: builder,
-      enumerable: false,
-      writable: true,
-      configurable: true,
-    },
-    [Symbol.toStringTag]: {
-      value: builder.name,
-      enumerable: false,
-      writable: true,
-      configurable: true,
-    },
-  });
-
-  return builder as any;
+  return Logger as any;
 }
 
 export const Logger: Logger = createLogger();
