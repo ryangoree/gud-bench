@@ -1,5 +1,11 @@
 # @gud/bench
 
+## 1.0.4
+
+### Patch Changes
+
+- 95633a3: Fixed release to actually include build 🤦‍♂️
+
 ## 1.0.3
 
 ### Patch Changes
