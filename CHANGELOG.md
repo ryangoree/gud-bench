@@ -1,5 +1,13 @@
 # @gud/bench
 
+## 1.1.0
+
+### Minor Changes
+
+- b454cb4:
+  - Added a `formatNumber` util for formatting number values as strings.
+  - Polished up some internals.
+
 ## 1.0.4
 
 ### Patch Changes
