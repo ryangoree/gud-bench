@@ -3,7 +3,6 @@
   "include": ["src"],
   "compilerOptions": {
     // Environment
-    "target": "ESNext",
     "lib": ["ESNext"],
     "module": "NodeNext",
     "moduleDetection": "force",
@@ -21,6 +20,7 @@
     "noPropertyAccessFromIndexSignature": false,
 
     // Output
+    "target": "ESNext",
     "rootDir": "src",
     "outDir": "dist",
     "declaration": true,

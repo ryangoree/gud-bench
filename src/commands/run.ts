@@ -5,7 +5,6 @@ import { benchmark, type RunOptions, type TestFunction } from '../Benchmark.js';
 import { Formatter, Logger } from '../utils/Logger.js';
 import { loadModule } from '../utils/loadModule.js';
 
-// Extend clide-js types for our custom GC strategy option
 declare module 'clide-js' {
   interface OptionCustomTypeMap {
     'gc-strategy': Required<RunOptions>['gcStrategy'];

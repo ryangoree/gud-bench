@@ -1,31 +1,17 @@
 import { spawn } from 'node:child_process';
-import { help, run } from 'clide-js';
+import { ClideError, help, run } from 'clide-js';
 import { commandMenu } from 'clide-plugin-command-menu';
 import { Logger } from './utils/Logger.js';
 
-// Check if we should restart with --expose-gc
 function needsExposeGC(): boolean {
-  // Already has GC available
-  if (typeof globalThis.gc === 'function') {
-    return false;
-  }
-
-  // Already has --expose-gc in execArgv
-  if (process.execArgv.includes('--expose-gc')) {
-    return false;
-  }
-
-  // Check if user explicitly disabled it via environment variable
-  if (process.env.BENCH_NO_EXPOSE_GC === 'true') {
-    return false;
-  }
-
+  if (typeof globalThis.gc === 'function') return false;
+  if (process.execArgv.includes('--expose-gc')) return false;
+  if (process.env.BENCH_NO_EXPOSE_GC === 'true') return false;
   return true;
 }
 
 async function restartWithExposeGC(): Promise<void> {
-  return new Promise((resolve) => {
-    // Simple restart with --expose-gc flag
+  return new Promise((resolve, reject) => {
     const args = [
       '--expose-gc',
       ...process.execArgv.filter((arg) => arg !== '--expose-gc'),
@@ -50,24 +36,18 @@ async function restartWithExposeGC(): Promise<void> {
     });
 
     child.on('error', (error) => {
-      // If restart fails, continue without --expose-gc
-      Logger.warn(`Could not restart with --expose-gc: ${error.message}`).warn(
-        'Continuing without garbage collection optimization...',
-      );
+      if (error instanceof ClideError) reject(error);
+      Logger.warn(`Could not restart with --expose-gc: ${error.message}`);
       resolve();
     });
   });
 }
 
-// Main execution logic
 async function main() {
-  // Only attempt restart if we haven't already restarted
   if (needsExposeGC() && !process.env.BENCH_RESTARTED) {
     await restartWithExposeGC();
-    return; // If we reach here, restart failed but we continue
   }
 
-  // Run the CLI normally
   run({
     plugins: [
       help(),
