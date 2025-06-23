@@ -4,7 +4,8 @@
 
 ### Minor Changes
 
-- b454cb4: - Added a `formatNumber` util for formatting number values as strings.
+- b454cb4:
+  - Added a `formatNumber` util for formatting number values as strings.
   - Polished up some internals.
 
 ## 1.0.4
