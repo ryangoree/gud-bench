@@ -1,14 +1,39 @@
 import { writeFileSync } from 'node:fs';
-import { parseFixed } from '@gud/math';
+import { formatNumber } from './utils/formatNumber.js';
 import { getTCritical95 } from './utils/getTCritical95.js';
 import { Formatter, Logger } from './utils/Logger.js';
 
-type ValueOption<V> = {
+export type TestFunction<V = any, R = any> = (value: V) => R | Promise<R>;
+
+export type TestFunctions<V = any, R = any> = {
+  name: string;
+  fn: TestFunction<V, R>;
+}[];
+
+export interface TestResult {
+  name: string;
+  samples: number[];
+  totalTime: number;
+  meanTime?: number;
+  opsPerSecond?: number;
+  stdDeviation?: number;
+  marginOfError?: number;
+}
+
+export type TestResults = TestResult[];
+
+type TestQueue<V = any, R = any> = {
+  runs: number;
+  fn: TestFunction<V, R>;
+  result: TestResult;
+}[];
+
+interface ValueOption<V> {
   /**
    * The value to pass to the test function.
    */
-  value?: V;
-};
+  value: V;
+}
 
 export type RunOptions<V = any, R = any> = {
   /**
@@ -61,9 +86,13 @@ export type RunOptions<V = any, R = any> = {
    * A function to validate the result. Return false or an error message to fail the test.
    */
   validate?: (result: R, value: V) => boolean | string;
-} & (undefined extends V ? ValueOption<V> : Required<ValueOption<V>>);
+} & (undefined extends V ? Partial<ValueOption<V>> : ValueOption<V>);
 
-type PreheatOptions<V = any> = Pick<
+export type RunArgs<V = any, R = any> = undefined extends V
+  ? [number, RunOptions<V, R>?]
+  : [number, RunOptions<V, R>];
+
+export type PreheatOptions<V = any> = Pick<
   RunOptions<V>,
   'value' | 'verbosity' | 'gcStrategy' | 'gcInterval'
 >;
@@ -71,35 +100,6 @@ type PreheatOptions<V = any> = Pick<
 export type PreheatArgs<V = any> = undefined extends V
   ? [number, PreheatOptions<V>?]
   : [number, PreheatOptions<V>];
-
-export type RunArgs<V = any, R = any> = undefined extends V
-  ? [number, RunOptions<V, R>?]
-  : [number, RunOptions<V, R>];
-
-export type TestFunction<V = any, R = any> = (value: V) => R | Promise<R>;
-
-export type TestFunctions<V = any, R = any> = {
-  name: string;
-  fn: TestFunction<V, R>;
-}[];
-
-export interface TestResult {
-  name: string;
-  samples: number[];
-  totalTime: number;
-  meanTime?: number;
-  opsPerSecond?: number;
-  stdDeviation?: number;
-  marginOfError?: number;
-}
-
-export type TestResults = TestResult[];
-
-export type TestQueue<V = any, R = any> = {
-  runs: number;
-  fn: TestFunction<V, R>;
-  result: TestResult;
-}[];
 
 export class Benchmark<TValue = any, TReturn = any> {
   name: string;
@@ -144,33 +144,32 @@ export class Benchmark<TValue = any, TReturn = any> {
   }
 
   /**
-   * Preheat the runner by running the tests a number of times.
-   * @param iterations - The number of times to run each test
-   * @param value - The value to pass to the test function
+   * Preheat the runner by running the tests to warm up the JIT compiler.
+   * @param iterations - The number of times to run each test.
+   * @param options - Options for the preheat.
    */
   preheat(
     ...[
       iterations,
       { value, verbosity = 1, gcStrategy, gcInterval } = {},
     ]: PreheatArgs<TValue>
-  ) {
+  ): Promise<this> {
     if (verbosity > 0) {
       Logger.pending(
         `${this.name}: Preheating ${this.tests.length} tests ${iterations} times each...`,
       );
     }
     return this.run(iterations, {
-      value,
+      value: value as TValue,
       verbosity: 0,
       gcStrategy,
       gcInterval,
-    } as RunOptions<TValue, TReturn>);
+    });
   }
 
   /**
    * Run the tests.
    * @param iterations - The number of times to run each test.
-   * @param value - The value to pass to the test function
    * @param options - Options for the run.
    */
   async run(
@@ -188,7 +187,7 @@ export class Benchmark<TValue = any, TReturn = any> {
     const hasGC = !!globalThis.gc;
     let iterationCount = 0;
 
-    // Show overall benchmark info once
+    // Show overall benchmark info
     if (verbosity > 0) {
       if (!hasGC && gcStrategy !== 'never') {
         Logger.warn('No GC hook! Consider running with --expose-gc');
@@ -214,6 +213,7 @@ export class Benchmark<TValue = any, TReturn = any> {
       }
     }
 
+    // Reset results
     this.results = this.tests.map(({ name }) => ({
       name,
       samples: [],
@@ -231,6 +231,7 @@ export class Benchmark<TValue = any, TReturn = any> {
         globalThis.gc?.();
       }
 
+      // Prepare queue for the current cycle
       const queue: TestQueue = this.results.map((result, i) => ({
         result,
         runs: 0,
@@ -288,39 +289,29 @@ export class Benchmark<TValue = any, TReturn = any> {
   printResults() {
     let totalTime = 0;
 
-    // Helper function to safely format numbers, avoiding the parseFixed error for very small values
-    const safeFormat = (value: number, decimals = 6) => {
-      try {
-        return parseFixed(value).format({
-          decimals,
-          trailingZeros: true,
-        });
-      } catch (_) {
-        return value.toFixed(decimals);
-      }
-    };
-
     const resultData = Object.fromEntries(
       this.results
         .sort((a, b) => a.totalTime - b.totalTime)
         .map((test, i) => {
           totalTime += test.totalTime;
 
-          const result: Record<string, string | number> = {
-            Runs: safeFormat(test.samples.length, 0),
-            'Total Time (ms)': safeFormat(test.totalTime, 4),
-            'AVG Time (ms)': safeFormat(test.totalTime / test.samples.length),
+          const data: Record<string, string | number> = {
+            Runs: formatNumber(test.samples.length, { decimals: 0 }),
+            'Total Time (ms)': formatNumber(test.totalTime, { decimals: 4 }),
+            'AVG Time (ms)': formatNumber(
+              test.meanTime ?? test.totalTime / test.samples.length,
+            ),
           };
 
           // Add enhanced statistics if available
           if (test.opsPerSecond) {
-            result['Ops/Sec'] = safeFormat(test.opsPerSecond, 0);
+            data['Ops/Sec'] = formatNumber(test.opsPerSecond, { decimals: 0 });
           }
 
           if (test.meanTime && test.marginOfError) {
-            result['± (%)'] = `${safeFormat(
+            data['± (%)'] = `${formatNumber(
               (test.marginOfError / test.meanTime) * 100,
-              2,
+              { decimals: 2 },
             )}%`;
           }
 
@@ -330,13 +321,13 @@ export class Benchmark<TValue = any, TReturn = any> {
                   i === 0 ? ' 🏆' : ''
                 }`
               : Formatter.bold(test.name),
-            result,
+            data,
           ];
         }),
     );
 
     Logger.table(resultData);
-    Logger.italic.info(`Total time: ${safeFormat(totalTime)} ms\n`);
+    Logger.italic.info(`Total time: ${formatNumber(totalTime)} ms\n`);
   }
 
   /**
@@ -385,7 +376,7 @@ export class Benchmark<TValue = any, TReturn = any> {
     const test = queue[i]!;
     test.result.totalTime += runTime;
     test.result.samples.push(runTime);
-    const testCompleted = ++test.runs === iterations;
+    const testCompleted = ++test.runs >= iterations;
     if (testCompleted) queue.splice(i, 1);
     if (validate) {
       const validationResult = validate(result, value) || 'Validation failed';
