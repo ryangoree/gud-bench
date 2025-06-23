@@ -4,7 +4,7 @@
 [![NPM Version](https://img.shields.io/badge/%40gud%2Fbench-cb3837?logo=npm)](https://npmjs.com/package/@gud/bench)
 [![License: Apache-2.0](https://img.shields.io/badge/Apache%202.0-23454d?logo=apache)](./LICENSE)
 
-**A powerful and elegant benchmarking tool for JavaScript and TypeScript with statistical accuracy and seamless TypeScript support.**
+**A powerful and elegant benchmarking tool for JavaScript and TypeScript.**
 
 ## ✨ Features
 
