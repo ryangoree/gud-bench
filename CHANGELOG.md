@@ -1,5 +1,13 @@
 # @gud/bench
 
+## 1.1.1
+
+### Patch Changes
+
+- bcf097f: Removed unnecessary type declarations and source maps from CLI files.
+- 6c95541: Updated CLI from clide-js to @gud/cli.
+- 03984d5: Added a missing shebang from the cli entrypoint.
+
 ## 1.1.0
 
 ### Minor Changes
