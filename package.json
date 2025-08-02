@@ -1,6 +1,6 @@
 {
   "name": "@gud/bench",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A powerful and elegant benchmarking tool for JavaScript and TypeScript.",
   "license": "Apache-2.0",
   "author": "Ryan Goree (https://github.com/ryangoree)",
