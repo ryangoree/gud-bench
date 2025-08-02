@@ -1,12 +1,12 @@
 import { existsSync } from 'node:fs';
 import { basename, extname, resolve } from 'node:path';
-import { command } from 'clide-js';
+import { command } from '@gud/cli';
 import { benchmark, type RunOptions, type TestFunction } from '../Benchmark.js';
 import { Formatter, Logger } from '../utils/Logger.js';
 import { loadModule } from '../utils/loadModule.js';
 
-declare module 'clide-js' {
-  interface OptionCustomTypeMap {
+declare module '@gud/cli' {
+  interface CustomOptionTypes {
     'gc-strategy': Required<RunOptions>['gcStrategy'];
     verbosity: 0 | 1 | 2;
   }

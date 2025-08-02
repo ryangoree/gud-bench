@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
-import { ClideError, help, run } from 'clide-js';
-import { commandMenu } from 'clide-plugin-command-menu';
+import { CliError, help, run } from '@gud/cli';
+import { menu } from '@gud/cli-menu';
 import { Logger } from './utils/Logger.js';
 
 function needsExposeGC(): boolean {
@@ -36,7 +36,7 @@ async function restartWithExposeGC(): Promise<void> {
     });
 
     child.on('error', (error) => {
-      if (error instanceof ClideError) reject(error);
+      if (error instanceof CliError) reject(error);
       Logger.warn(`Could not restart with --expose-gc: ${error.message}`);
       resolve();
     });
@@ -51,7 +51,7 @@ async function main() {
   run({
     plugins: [
       help(),
-      commandMenu({
+      menu({
         enabled: (options) => !options.help,
       }),
     ],
