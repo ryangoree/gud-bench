@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { spawn } from 'node:child_process';
 import { CliError, help, run } from '@gud/cli';
 import { menu } from '@gud/cli-menu';
