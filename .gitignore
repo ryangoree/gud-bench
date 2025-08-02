@@ -1,3 +1,17 @@
+# os
+.DS_Store
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
 # local
 *.env
 *.pem
@@ -10,29 +24,14 @@
 logs
 _.log
 
+# dependencies
+node_modules
+
 # artifacts
 dist
-out
-build
 results
+*.tsbuildinfo
+*.tgz
 
 # testing
 coverage
-
-# package manager
-node_modules
-*.tgz
-
-# language
-*.tsbuildinfo
-
-# os
-.DS_Store
-
-# editor
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
-
-# config
-web3-dev-cli.json*

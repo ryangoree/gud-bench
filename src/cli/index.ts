@@ -2,7 +2,7 @@
 import { spawn } from 'node:child_process';
 import { CliError, help, run } from '@gud/cli';
 import { menu } from '@gud/cli-menu';
-import { Logger } from './utils/Logger.js';
+import { Logger } from '#src/lib/utils/Logger';
 
 function needsExposeGC(): boolean {
   if (typeof globalThis.gc === 'function') return false;

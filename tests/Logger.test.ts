@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { after, before, beforeEach, describe, it } from 'node:test';
-import { Formatter, Logger } from '../src/utils/Logger.js';
+import { Formatter, Logger } from '#src/lib/utils/Logger';
 
 describe('Logger', () => {
   let originalConsoleLog: typeof console.log;

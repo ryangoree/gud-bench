@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.json",
+  "include": ["src/lib"],
+  "compilerOptions": {
+    // Output
+    "composite": true,
+    "target": "ESNext",
+    "rootDir": "src/lib",
+    "outDir": "dist/lib",
+    "declaration": true,
+    "sourceMap": true,
+    "esModuleInterop": true
+  }
+}

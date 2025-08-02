@@ -22,8 +22,8 @@ describe('CLI Integration', () => {
     }
   });
 
-  function runCLI(
-    args,
+  function runCli(
+    args: string[],
     options = {},
   ): Promise<{
     code: number | null;
@@ -31,7 +31,7 @@ describe('CLI Integration', () => {
     stderr: string;
   }> {
     return new Promise((resolve, reject) => {
-      const child = spawn('bun', [cliPath, ...args], {
+      const child = spawn('tsx', [cliPath, ...args], {
         stdio: 'pipe',
         cwd: process.cwd(),
         ...options,
@@ -66,7 +66,7 @@ describe('CLI Integration', () => {
 
   describe('CLI Help and Usage', () => {
     it('should show help when requested', async () => {
-      const result = await runCLI(['--help']);
+      const result = await runCli(['--help']);
 
       assert.strictEqual(result.code, 0);
       assert.ok(result.stdout.includes('Usage:'));
@@ -76,7 +76,7 @@ describe('CLI Integration', () => {
     });
 
     it('should show help for run command', async () => {
-      const result = await runCLI(['run', '--help']);
+      const result = await runCli(['run', '--help']);
 
       assert.strictEqual(result.code, 0);
       assert.ok(result.stdout.includes('files'));
@@ -108,7 +108,7 @@ describe('CLI Integration', () => {
 
       writeFileSync(testFile, testContent);
 
-      const result = await runCLI([
+      const result = await runCli([
         'run',
         '--files',
         testFile,
@@ -136,7 +136,7 @@ describe('CLI Integration', () => {
 
       writeFileSync(testFile, testContent);
 
-      const result = await runCLI([
+      const result = await runCli([
         'run',
         '--files',
         testFile,
@@ -174,7 +174,7 @@ describe('CLI Integration', () => {
 
       writeFileSync(testFile, testContent);
 
-      const result = await runCLI([
+      const result = await runCli([
         'run',
         '--files',
         testFile,
@@ -198,7 +198,7 @@ describe('CLI Integration', () => {
       writeFileSync(testFile, testContent);
 
       // Test silent mode
-      const silentResult = await runCLI([
+      const silentResult = await runCli([
         'run',
         '--files',
         testFile,
@@ -213,7 +213,7 @@ describe('CLI Integration', () => {
       assert.ok(silentResult.stdout.length < 100);
 
       // Test verbose mode
-      const verboseResult = await runCLI([
+      const verboseResult = await runCli([
         'run',
         '--files',
         testFile,
@@ -232,7 +232,7 @@ describe('CLI Integration', () => {
       const testContent = `export function test() { return Math.random(); }`;
       writeFileSync(testFile, testContent);
 
-      const result = await runCLI([
+      const result = await runCli([
         'run',
         '--files',
         testFile,
@@ -255,7 +255,7 @@ describe('CLI Integration', () => {
       const testContent = `export function preheatTest() { return 'preheated'; }`;
       writeFileSync(testFile, testContent);
 
-      const result = await runCLI([
+      const result = await runCli([
         'run',
         '--files',
         testFile,
@@ -279,7 +279,7 @@ describe('CLI Integration', () => {
       const testContent = `export function namedFunction() { return 'named'; }`;
       writeFileSync(testFile, testContent);
 
-      const result = await runCLI([
+      const result = await runCli([
         'run',
         '--files',
         testFile,
@@ -311,7 +311,7 @@ describe('CLI Integration', () => {
       writeFileSync(testFile, testContent);
 
       // Test with 'never' strategy
-      const neverResult = await runCLI([
+      const neverResult = await runCli([
         'run',
         '--files',
         testFile,
@@ -327,7 +327,7 @@ describe('CLI Integration', () => {
       assert.ok(neverResult.stdout.includes('never'));
 
       // Test with 'periodic' strategy
-      const periodicResult = await runCLI([
+      const periodicResult = await runCli([
         'run',
         '--files',
         testFile,
@@ -354,7 +354,7 @@ describe('CLI Integration', () => {
       writeFileSync(file1, `export function file1Test() { return 'file1'; }`);
       writeFileSync(file2, `export function file2Test() { return 'file2'; }`);
 
-      const result = await runCLI([
+      const result = await runCli([
         'run',
         '--files',
         `${file1},${file2}`,
@@ -373,7 +373,7 @@ describe('CLI Integration', () => {
 
   describe('Error Handling', () => {
     it('should handle non-existent files gracefully', async () => {
-      const result = await runCLI([
+      const result = await runCli([
         'run',
         '--files',
         './non-existent-file.js',
@@ -393,7 +393,7 @@ describe('CLI Integration', () => {
       const testContent = `const value = 42; export { value };`;
       writeFileSync(testFile, testContent);
 
-      const result = await runCLI(['run', '--files', testFile, '--runs', '10']);
+      const result = await runCli(['run', '--files', testFile, '--runs', '10']);
 
       assert.notStrictEqual(result.code, 0);
       assert.ok(
@@ -407,7 +407,7 @@ describe('CLI Integration', () => {
       const testContent = `export function broken( { return "broken"; }`;
       writeFileSync(testFile, testContent);
 
-      const result = await runCLI(['run', '--files', testFile, '--runs', '10']);
+      const result = await runCli(['run', '--files', testFile, '--runs', '10']);
 
       assert.notStrictEqual(result.code, 0);
     });
@@ -431,7 +431,7 @@ describe('CLI Integration', () => {
       `;
       writeFileSync(testFile, testContent);
 
-      const result = await runCLI([
+      const result = await runCli([
         'run',
         '--files',
         testFile,

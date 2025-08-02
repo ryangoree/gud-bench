@@ -8,7 +8,7 @@ import {
 } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { after, before, describe, it } from 'node:test';
-import { loadModule } from '../src/utils/loadModule.js';
+import { loadModule } from '#src/lib/utils/loadModule';
 
 describe('loadModule', () => {
   const testDir = resolve('./test-modules');

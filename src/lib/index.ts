@@ -9,12 +9,12 @@ export {
   type TestFunctions,
   type TestResult,
   type TestResults,
-} from './Benchmark.js';
-export { formatNumber } from './utils/formatNumber.js';
+} from '#src/lib/Benchmark';
+export { formatNumber } from '#src/lib/utils/formatNumber';
 export {
   Formatter,
   Logger,
   type LoggerConfirmOptions,
   type TextFormatter,
-} from './utils/Logger.js';
-export { loadModule } from './utils/loadModule.js';
+} from '#src/lib/utils/Logger';
+export { loadModule } from '#src/lib/utils/loadModule';

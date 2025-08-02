@@ -1,9 +1,13 @@
 import { existsSync } from 'node:fs';
 import { basename, extname, resolve } from 'node:path';
 import { command } from '@gud/cli';
-import { benchmark, type RunOptions, type TestFunction } from '../Benchmark.js';
-import { Formatter, Logger } from '../utils/Logger.js';
-import { loadModule } from '../utils/loadModule.js';
+import {
+  benchmark,
+  type RunOptions,
+  type TestFunction,
+} from '#src/lib/Benchmark';
+import { Formatter, Logger } from '#src/lib/utils/Logger';
+import { loadModule } from '#src/lib/utils/loadModule';
 
 declare module '@gud/cli' {
   interface CustomOptionTypes {

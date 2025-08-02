@@ -1,7 +1,7 @@
 import { writeFileSync } from 'node:fs';
-import { formatNumber } from './utils/formatNumber.js';
-import { getTCritical95 } from './utils/getTCritical95.js';
-import { Formatter, Logger } from './utils/Logger.js';
+import { formatNumber } from '#src/lib/utils/formatNumber';
+import { getTCritical95 } from '#src/lib/utils/getTCritical95';
+import { Formatter, Logger } from '#src/lib/utils/Logger';
 
 export type TestFunction<V = any, R = any> = (value: V) => R | Promise<R>;
 

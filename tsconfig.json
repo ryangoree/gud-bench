@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "include": ["src"],
+  "include": ["src", "tests"],
   "compilerOptions": {
     // Environment
     "lib": ["ESNext"],
@@ -10,6 +10,10 @@
     "isolatedModules": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "#src/*": ["src/*.ts"]
+    },
 
     // Type Checking
     "skipLibCheck": true,
@@ -17,14 +21,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": false,
-
-    // Output
-    "target": "ESNext",
-    "rootDir": "src",
-    "outDir": "dist",
-    "declaration": true,
-    "sourceMap": true,
-    "esModuleInterop": true
+    "noPropertyAccessFromIndexSignature": false
   }
 }

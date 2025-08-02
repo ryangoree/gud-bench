@@ -11,18 +11,19 @@
   "sideEffects": false,
   "type": "module",
   "bin": {
-    "bench": "dist/cli.js"
+    "bench": "dist/cli/index.js"
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/lib/index.d.ts",
+      "default": "./dist/lib/index.js"
     },
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc",
-    "build:watch": "tsc --watch",
+    "clean": "tsc --build --clean tsconfig.cli.json tsconfig.lib.json",
+    "build": "tsc --build tsconfig.cli.json tsconfig.lib.json",
+    "watch": "tsc --build tsconfig.cli.json tsconfig.lib.json --watch",
     "bench": "node dist/cli.js",
     "test": "tsx --test tests/*.test.ts",
     "format": "biome format --write",
@@ -47,8 +48,11 @@
     "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "imports": {
+    "#src/*": "./dist/*.js"
+  },
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
   "files": [
     "dist"
   ],
