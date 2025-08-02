@@ -4,31 +4,21 @@
   "description": "A powerful and elegant benchmarking tool for JavaScript and TypeScript.",
   "license": "Apache-2.0",
   "author": "Ryan Goree (https://github.com/ryangoree)",
-  "repository": "https://github.com/ryangoree/gud-bench",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryangoree/gud-bench.git"
+  },
   "sideEffects": false,
   "type": "module",
   "bin": {
     "bench": "dist/cli.js"
   },
-  "files": [
-    "dist"
-  ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "peerDependencies": {
-    "typescript": ">5"
-  },
-  "dependencies": {
-    "@gud/math": "^1.0.0",
-    "@gud/cli": "^1.0.0-beta.7",
-    "@gud/cli-menu": "^1.0.0-beta.5"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.1.3",
-    "@changesets/cli": "^2.29.5",
-    "@types/node": "^24.1.0",
-    "tsx": "^4.20.3",
-    "typescript": "^5.9.2"
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "rm -rf dist && tsc",
@@ -42,20 +32,26 @@
     "typecheck": "tsc --noEmit",
     "release": "npm run build && changeset publish"
   },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./package.json": "./package.json"
+  "peerDependencies": {
+    "typescript": ">5"
   },
-  "typesVersions": {
-    "*": {
-      ".": [
-        "./dist/index.d.ts"
-      ]
-    }
+  "dependencies": {
+    "@gud/cli": "^1.0.0-beta.7",
+    "@gud/cli-menu": "^1.0.0-beta.5",
+    "@gud/math": "^1.0.0"
   },
+  "devDependencies": {
+    "@biomejs/biome": "^2.1.3",
+    "@changesets/cli": "^2.29.5",
+    "@types/node": "^24.1.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   }
