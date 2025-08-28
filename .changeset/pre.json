@@ -4,5 +4,12 @@
   "initialVersions": {
     "@gud/bench": "1.1.0"
   },
-  "changesets": []
+  "changesets": [
+    "crazy-brooms-sell",
+    "cyan-forks-mix",
+    "fresh-pillows-wait",
+    "nine-cups-itch",
+    "silver-rings-brake",
+    "silver-shoes-cut"
+  ]
 }
