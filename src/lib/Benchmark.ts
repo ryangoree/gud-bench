@@ -19,8 +19,6 @@ export interface TestResult {
   marginOfError?: number;
 }
 
-export type TestResults = TestResult[];
-
 type TestQueue<V = any, R = any> = {
   runs: number;
   fn: TestFunction<V, R>;
@@ -106,7 +104,7 @@ export class Benchmark<TValue = any, TReturn = any> {
   /**
    * The results of the tests.
    */
-  results: TestResults = [];
+  results: TestResult[] = [];
 
   #tests: TestFunctions = [];
 
