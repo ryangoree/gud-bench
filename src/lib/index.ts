@@ -10,7 +10,6 @@ export {
   type TestResult,
   type TestResults,
 } from '#src/lib/Benchmark';
-export { formatNumber } from '#src/lib/utils/formatNumber';
 export {
   Formatter,
   Logger,

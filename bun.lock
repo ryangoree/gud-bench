@@ -6,7 +6,6 @@
       "dependencies": {
         "@gud/cli": "^1.0.0-beta.7",
         "@gud/cli-menu": "^1.0.0-beta.5",
-        "@gud/math": "^1.0.0",
       },
       "devDependencies": {
         "@biomejs/biome": "^2.1.3",
@@ -16,7 +15,7 @@
         "typescript": "^5.9.2",
       },
       "peerDependencies": {
-        "typescript": ">5",
+        "typescript": "^5",
       },
     },
   },
@@ -128,8 +127,6 @@
     "@gud/cli": ["@gud/cli@1.0.0-beta.7", "", { "dependencies": { "@types/prompts": "^2.4.9", "cliui": "^8.0.1", "prompts": "^2.4.2", "yargs-parser": "^22.0.0" } }, "sha512-2kR6JJGN3+rPkl9LCxLWaw4QX8UgsQxMOIBqIGqVnCioK2rqNcRB87KCxYrGVSmxT4DPtI+I7eZUnR8gBooR4w=="],
 
     "@gud/cli-menu": ["@gud/cli-menu@1.0.0-beta.5", "", { "dependencies": { "cfonts": "^3.3.0", "colors": "^1.4.0" }, "peerDependencies": { "@gud/cli": "^1.0.0-beta.7" } }, "sha512-kCPNO0z8iD2jj2RbHmsLBsmkMwM9SWZHtfiSjOHX9tX6t6zLzemC5jwPjZnPhN5wV0X9IqwtiZ5vFegYb4UsEg=="],
-
-    "@gud/math": ["@gud/math@1.0.0", "", {}, "sha512-gxxxjMo8y81CuyN6qwh6gO5nt8kL90i/4z5CbnYBKyeujbUpVTXPDLRn8SaKZC6i71IOXyab4L4wCZIg2G8LOg=="],
 
     "@manypkg/find-root": ["@manypkg/find-root@1.1.0", "", { "dependencies": { "@babel/runtime": "^7.5.5", "@types/node": "^12.7.1", "find-up": "^4.1.0", "fs-extra": "^8.1.0" } }, "sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA=="],
 

@@ -1,5 +1,4 @@
 import { writeFileSync } from 'node:fs';
-import { formatNumber } from '#src/lib/utils/formatNumber';
 import { getTCritical95 } from '#src/lib/utils/getTCritical95';
 import { Formatter, Logger } from '#src/lib/utils/Logger';
 
@@ -197,7 +196,9 @@ export class Benchmark<TValue = any, TReturn = any> {
           cycles > 1 ? Formatter.dim(` (${cycles} cycles)`) : ''
         }`,
       ).pending(
-        `Running ${cycles} ${cycles > 1 ? 'cycles' : 'cycle'} of ${this.tests.length} ${
+        `Running ${cycles} ${cycles > 1 ? 'cycles' : 'cycle'} of ${
+          this.tests.length
+        } ${
           this.tests.length > 1 ? 'tests' : 'test'
         } ${iterations} times each...`,
       );
@@ -296,23 +297,37 @@ export class Benchmark<TValue = any, TReturn = any> {
           totalTime += test.totalTime;
 
           const data: Record<string, string | number> = {
-            Runs: formatNumber(test.samples.length, { decimals: 0 }),
-            'Total Time (ms)': formatNumber(test.totalTime, { decimals: 4 }),
-            'AVG Time (ms)': formatNumber(
-              test.meanTime ?? test.totalTime / test.samples.length,
-            ),
+            Runs: test.samples.length.toLocaleString(undefined, {
+              maximumFractionDigits: 0,
+            }),
+            'Total Time (ms)': test.totalTime.toLocaleString(undefined, {
+              minimumFractionDigits: 4,
+              maximumFractionDigits: 4,
+            }),
+            'AVG Time (ms)': (
+              test.meanTime ?? test.totalTime / test.samples.length
+            ).toLocaleString(undefined, {
+              minimumFractionDigits: 6,
+              maximumFractionDigits: 6,
+            }),
           };
 
           // Add enhanced statistics if available
           if (test.opsPerSecond) {
-            data['Ops/Sec'] = formatNumber(test.opsPerSecond, { decimals: 0 });
+            data['Ops/Sec'] = test.opsPerSecond.toLocaleString(undefined, {
+              minimumFractionDigits: 6,
+              maximumFractionDigits: 6,
+            });
           }
 
           if (test.meanTime && test.marginOfError) {
-            data['± (%)'] = `${formatNumber(
-              (test.marginOfError / test.meanTime) * 100,
-              { decimals: 2 },
-            )}%`;
+            data['± (%)'] = `${(
+              test.marginOfError / test.meanTime
+            ).toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+              style: 'percent',
+            })}`;
           }
 
           return [
@@ -327,7 +342,11 @@ export class Benchmark<TValue = any, TReturn = any> {
     );
 
     Logger.table(resultData);
-    Logger.italic.info(`Total time: ${formatNumber(totalTime)} ms\n`);
+    Logger.italic.info(
+      `Total time: ${totalTime.toLocaleString(undefined, {
+        maximumFractionDigits: 6,
+      })} ms\n`,
+    );
   }
 
   /**
