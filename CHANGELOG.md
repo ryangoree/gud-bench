@@ -1,5 +1,16 @@
 # @gud/bench
 
+## 2.0.0-next.0
+
+### Major Changes
+
+- be2c6d3: Removed the `TestResults` type which was just `TestResult[]`.
+- 5015ff1: Removed the `formatNumber` util and replaced internal usage with `toLocaleString()` method calls.
+
+### Minor Changes
+
+- bab285c: Added a type param for the test names to help with intellisense.
+
 ## 1.1.1
 
 ### Patch Changes
