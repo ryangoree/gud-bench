@@ -38,8 +38,7 @@
   },
   "dependencies": {
     "@gud/cli": "^1.0.0-beta.7",
-    "@gud/cli-menu": "^1.0.0-beta.5",
-    "@gud/math": "^1.0.0"
+    "@gud/cli-menu": "^1.0.0-beta.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.1.3",
