@@ -6,7 +6,7 @@ import { after, before, describe, it } from 'node:test';
 
 describe('CLI Integration', () => {
   const testDir = './test-cli-files';
-  const cliPath = './src/cli.js';
+  const cliPath = './src/cli/index.js';
 
   before(() => {
     // Create test directory
@@ -69,19 +69,21 @@ describe('CLI Integration', () => {
       const result = await runCli(['--help']);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('Usage:'));
-      assert.ok(result.stdout.includes('OPTIONS:'));
-      assert.ok(result.stdout.includes('--files'));
-      assert.ok(result.stdout.includes('--runs'));
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /Usage:/);
+      assert.match(result.stdout, /OPTIONS:/);
+      assert.match(result.stdout, /--files/);
+      assert.match(result.stdout, /--runs/);
     });
 
     it('should show help for run command', async () => {
       const result = await runCli(['run', '--help']);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('files'));
-      assert.ok(result.stdout.includes('runs'));
-      assert.ok(result.stdout.includes('verbosity'));
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /files/);
+      assert.match(result.stdout, /runs/);
+      assert.match(result.stdout, /verbosity/);
     });
   });
 
@@ -92,7 +94,7 @@ describe('CLI Integration', () => {
         export function fastFunction() {
           return 42;
         }
-        
+
         export function slowFunction() {
           let sum = 0;
           for (let i = 0; i < 100; i++) {
@@ -100,7 +102,7 @@ describe('CLI Integration', () => {
           }
           return sum;
         }
-        
+
         export function asyncFunction() {
           return Promise.resolve('async result');
         }
@@ -119,11 +121,12 @@ describe('CLI Integration', () => {
       ]);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('fastFunction'));
-      assert.ok(result.stdout.includes('slowFunction'));
-      assert.ok(result.stdout.includes('asyncFunction'));
-      assert.ok(result.stdout.includes('Loading 1 files'));
-      assert.ok(result.stdout.includes('Ops/Sec'));
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /fastFunction/);
+      assert.match(result.stdout, /slowFunction/);
+      assert.match(result.stdout, /asyncFunction/);
+      assert.match(result.stdout, /Loading 1 files/);
+      assert.match(result.stdout, /Ops\/Sec/);
     });
 
     it('should benchmark JavaScript file with default export', async () => {
@@ -147,8 +150,9 @@ describe('CLI Integration', () => {
       ]);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('default-export'));
-      assert.ok(result.stdout.includes('Total time:'));
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /default-export/);
+      assert.match(result.stdout, /Total time:/);
     });
   });
 
@@ -159,16 +163,16 @@ describe('CLI Integration', () => {
         interface TestData {
           value: number;
         }
-        
+
         export function typedSort(arr: number[] = [3, 1, 4, 1, 5]): number[] {
           return arr.sort((a, b) => a - b);
         }
-        
+
         export function arraySum(): number {
           const arr = [1, 2, 3, 4, 5];
           return arr.reduce((sum, num) => sum + num, 0);
         }
-        
+
         export const constValue: number = 123;
       `;
 
@@ -185,9 +189,10 @@ describe('CLI Integration', () => {
       ]);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('typedSort'));
-      assert.ok(result.stdout.includes('arraySum'));
-      assert.ok(result.stdout.includes('Loading 1 files'));
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /typedSort/);
+      assert.match(result.stdout, /arraySum/);
+      assert.match(result.stdout, /Loading 1 files/);
     });
   });
 
@@ -245,9 +250,9 @@ describe('CLI Integration', () => {
       ]);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(
-        result.stdout.includes('cycles') || result.stdout.includes('Cycle'),
-      );
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /cycles/);
+      assert.match(result.stdout, /Cycle/);
     });
 
     it('should handle preheat option', async () => {
@@ -268,10 +273,8 @@ describe('CLI Integration', () => {
       ]);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(
-        result.stdout.includes('Preheating') ||
-          result.stdout.includes('preheat'),
-      );
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /Preheating/);
     });
 
     it('should handle custom benchmark name', async () => {
@@ -286,13 +289,14 @@ describe('CLI Integration', () => {
         '--runs',
         '15',
         '--name',
-        'Custom Benchmark Name',
+        'Custom',
         '--verbosity',
         '1',
       ]);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('Custom Benchmark Name'));
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /Custom/);
     });
   });
 
@@ -324,7 +328,7 @@ describe('CLI Integration', () => {
       ]);
 
       assert.strictEqual(neverResult.code, 0);
-      assert.ok(neverResult.stdout.includes('never'));
+      assert.match(neverResult.stdout, /never/);
 
       // Test with 'periodic' strategy
       const periodicResult = await runCli([
@@ -342,7 +346,7 @@ describe('CLI Integration', () => {
       ]);
 
       assert.strictEqual(periodicResult.code, 0);
-      assert.ok(periodicResult.stdout.includes('periodic'));
+      assert.match(periodicResult.stdout, /periodic/);
     });
   });
 
@@ -365,9 +369,10 @@ describe('CLI Integration', () => {
       ]);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('Loading 2 files'));
-      assert.ok(result.stdout.includes('file1Test'));
-      assert.ok(result.stdout.includes('file2Test'));
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /Loading 2 files/);
+      assert.match(result.stdout, /file1Test/);
+      assert.match(result.stdout, /file2Test/);
     });
   });
 
@@ -382,10 +387,12 @@ describe('CLI Integration', () => {
       ]);
 
       assert.notStrictEqual(result.code, 0);
-      assert.ok(
-        result.stderr.includes('not found') ||
-          result.stdout.includes('not found'),
-      );
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /not found/);
+      // assert.ok(
+      //   result.stderr.includes('not found') ||
+      //     result.stdout.includes('not found'),
+      // );
     });
 
     it('should handle files with no functions', async () => {
@@ -396,10 +403,12 @@ describe('CLI Integration', () => {
       const result = await runCli(['run', '--files', testFile, '--runs', '10']);
 
       assert.notStrictEqual(result.code, 0);
-      assert.ok(
-        result.stderr.includes('function') ||
-          result.stdout.includes('function'),
-      );
+      assert.strictEqual(result.stderr, '');
+      assert.match(result.stdout, /function/);
+      // assert.ok(
+      //   result.stderr.includes('function') ||
+      //     result.stdout.includes('function'),
+      // );
     });
 
     it('should handle syntax errors in files', async () => {
@@ -410,6 +419,7 @@ describe('CLI Integration', () => {
       const result = await runCli(['run', '--files', testFile, '--runs', '10']);
 
       assert.notStrictEqual(result.code, 0);
+      assert.strictEqual(result.stderr, '');
     });
   });
 
@@ -418,12 +428,12 @@ describe('CLI Integration', () => {
       const testFile = join(testDir, 'table-output.js');
       const testContent = `
         export function fast() { return 1; }
-        export function medium() { 
+        export function medium() {
           let sum = 0;
           for (let i = 0; i < 10; i++) sum += i;
           return sum;
         }
-        export function slow() { 
+        export function slow() {
           let sum = 0;
           for (let i = 0; i < 100; i++) sum += i;
           return sum;
@@ -442,22 +452,23 @@ describe('CLI Integration', () => {
       ]);
 
       assert.strictEqual(result.code, 0);
+      assert.strictEqual(result.stderr, '');
 
       // Check for table structure
-      assert.ok(result.stdout.includes('│')); // Table borders
-      assert.ok(result.stdout.includes('┌')); // Table top
-      assert.ok(result.stdout.includes('└')); // Table bottom
-      assert.ok(result.stdout.includes('Runs'));
-      assert.ok(result.stdout.includes('Total Time'));
-      assert.ok(result.stdout.includes('AVG Time'));
-      assert.ok(result.stdout.includes('Ops/Sec'));
+      assert.match(result.stdout, /│/); // Table borders
+      assert.match(result.stdout, /┌/); // Table top
+      assert.match(result.stdout, /└/); // Table bottom
+      assert.match(result.stdout, /Runs/);
+      assert.match(result.stdout, /Total Time/);
+      assert.match(result.stdout, /AVG Time/);
+      assert.match(result.stdout, /Ops\/Sec/);
 
       // Check for winner indicator
-      assert.ok(result.stdout.includes('🏆'));
+      assert.match(result.stdout, /🏆/);
 
       // Check for total time
-      assert.ok(result.stdout.includes('Total time:'));
-      assert.ok(result.stdout.includes('ms'));
+      assert.match(result.stdout, /Total time:/);
+      assert.match(result.stdout, /ms/);
     });
   });
 });
