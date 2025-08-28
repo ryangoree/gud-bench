@@ -4,13 +4,13 @@ import { Formatter, Logger } from '#src/lib/utils/Logger';
 
 export type TestFunction<V = any, R = any> = (value: V) => R | Promise<R>;
 
-export type TestFunctions<V = any, R = any> = {
-  name: string;
+export type TestFunctions<N extends string = string, V = any, R = any> = {
+  name: N;
   fn: TestFunction<V, R>;
 }[];
 
-export interface TestResult {
-  name: string;
+export interface TestResult<N extends string = string> {
+  name: N;
   samples: number[];
   totalTime: number;
   meanTime?: number;
@@ -19,10 +19,10 @@ export interface TestResult {
   marginOfError?: number;
 }
 
-type TestQueue<V = any, R = any> = {
+type TestQueue<N extends string = string, V = any, R = any> = {
   runs: number;
   fn: TestFunction<V, R>;
-  result: TestResult;
+  result: TestResult<N>;
 }[];
 
 interface ValueOption<V> {
@@ -98,13 +98,17 @@ export type PreheatArgs<V = any> = undefined extends V
   ? [number, PreheatOptions<V>?]
   : [number, PreheatOptions<V>];
 
-export class Benchmark<TValue = any, TReturn = any> {
+export class Benchmark<
+  TTestName extends string & {} = string & {},
+  TValue = any,
+  TReturn = any,
+> {
   name: string;
 
   /**
    * The results of the tests.
    */
-  results: TestResult[] = [];
+  results: TestResult<TTestName>[] = [];
 
   #tests: TestFunctions = [];
 
@@ -116,28 +120,28 @@ export class Benchmark<TValue = any, TReturn = any> {
    * The tests to be run.
    */
   get tests() {
-    return this.#tests as TestFunctions<TValue, TReturn>;
+    return this.#tests as TestFunctions<TTestName, TValue, TReturn>;
   }
 
   /**
    * Add a test to be run
    */
-  test<V extends TValue, R extends TReturn>(
-    name: string,
+  test<N extends string, V extends TValue, R extends TReturn>(
+    name: N,
     fn: TestFunction<V, R>,
-  ): Benchmark<V, R>;
+  ): Benchmark<TTestName | N, V, R>;
   test<V extends TValue, R extends TReturn>(
     fn: TestFunction<V, R>,
-  ): Benchmark<V, R>;
-  test<V extends TValue, R extends TReturn>(
-    name: string | TestFunction<V, R>,
+  ): Benchmark<TTestName | `Test ${number}`, V, R>;
+  test<N extends string, V extends TValue, R extends TReturn>(
+    name: N | TestFunction<V, R>,
     fn = name as TestFunction<V, R>,
-  ): Benchmark<V, R> {
+  ): Benchmark<TTestName | N, V, R> {
     if (typeof name === 'function') {
-      name = `Test ${this.tests.length + 1}`;
+      name = `Test ${this.tests.length + 1}` as N;
     }
     this.#tests.push({ name, fn });
-    return this as unknown as Benchmark<V, R>;
+    return this as unknown as Benchmark<N, V, R>;
   }
 
   /**
@@ -475,6 +479,6 @@ export class Benchmark<TValue = any, TReturn = any> {
 /**
  * Create a new benchmark suite.
  */
-export function benchmark<V, R>(name = 'Benchmark') {
-  return new Benchmark<V, R>(name);
+export function benchmark<N extends string & {}, V, R>(name = 'Benchmark') {
+  return new Benchmark<N, V, R>(name);
 }
