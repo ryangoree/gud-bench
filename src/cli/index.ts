@@ -15,7 +15,7 @@ async function restartWithExposeGC(): Promise<void> {
   return new Promise((resolve, reject) => {
     const args = [
       '--expose-gc',
-      ...process.execArgv.filter((arg) => arg !== '--expose-gc'),
+      ...process.execArgv,
       process.argv[1], // The script path
       ...process.argv.slice(2), // CLI arguments
     ];
@@ -71,3 +71,17 @@ main().catch((error) => {
   Logger.error(error);
   process.exit(1);
 });
+
+// const parsed = {
+//   tokens: ['Benchmark', 'Name'],
+//   options: {
+//     files: ['test-cli-files/named-test.js'],
+//     f: ['test-cli-files/named-test.js'],
+//     runs: 15,
+//     r: 15,
+//     name: 'Custom',
+//     n: 'Custom',
+//     verbosity: 1,
+//     v: 1,
+//   },
+// };
