@@ -8,7 +8,6 @@ export {
   type TestFunction,
   type TestFunctions,
   type TestResult,
-  type TestResults,
 } from '#src/lib/Benchmark';
 export {
   Formatter,
