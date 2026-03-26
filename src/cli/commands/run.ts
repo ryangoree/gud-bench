@@ -112,9 +112,11 @@ export default command({
     // Create benchmark suite
     const bench = benchmark(customName);
 
-    Logger.pending(
-      `📁 Loading ${resolvedFiles.length} files for benchmarking...`,
-    );
+    if (verbosity > 0) {
+      Logger.pending(
+        `📁 Loading ${resolvedFiles.length} file${resolvedFiles.length > 1 ? 's' : ''} for benchmarking...`,
+      );
+    }
 
     // Load and prepare test functions
     for (const filePath of resolvedFiles) {
