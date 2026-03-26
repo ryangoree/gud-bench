@@ -36,7 +36,7 @@ bench --files my-functions.js --export true
 ```
 
 The CLI will automatically detect and benchmark:
-- Default exports (`export default function`)
+- Default exports (`export default function()`)
 - Named function exports (`export function myFunction()`)
 - Specific benchmark functions (`export { benchmark }` or `export { test }`)
 
