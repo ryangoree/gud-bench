@@ -4,17 +4,7 @@
 [![NPM Version](https://img.shields.io/badge/%40gud%2Fbench-cb3837?logo=npm)](https://npmjs.com/package/@gud/bench)
 [![License: Apache-2.0](https://img.shields.io/badge/Apache%202.0-23454d?logo=apache)](./LICENSE)
 
-**A powerful and elegant benchmarking tool for JavaScript and TypeScript.**
-
-## ✨ Features
-
-- 🚀 **Zero-config benchmarking** - Just point it at your functions
-- 📊 **Statistical accuracy** with multiple cycles and margin of error calculation
-- 🔧 **TypeScript support** - Transpiles `.ts` files on-the-fly
-- ⚡ **Multiple export patterns** - Detects default, named, and benchmark exports
-- 🗑️ **Memory management** - Advanced garbage collection strategies
-- 📈 **Export results** - JSON output for further analysis
-- 📦 **Library + CLI** - Use programmatically or via command line
+**A small benchmarking library & CLI for JavaScript and TypeScript.**
 
 ## Installing
 
@@ -96,7 +86,7 @@ export function bubbleSort(arr = data) {
 
 ## Programmatic API
 
-Create sophisticated benchmarks with the programmatic API:
+Create benchmark scripts with the programmatic API:
 
 ```js
 import { benchmark } from '@gud/bench';
