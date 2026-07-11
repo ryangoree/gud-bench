@@ -1,8 +1,8 @@
-import assert from 'node:assert';
-import { after, before, beforeEach, describe, it } from 'node:test';
-import { Formatter, Logger } from '#src/lib/utils/Logger';
+import assert from "node:assert";
+import { after, before, beforeEach, describe, it } from "node:test";
+import { Formatter, Logger } from "#src/lib/utils/Logger";
 
-describe('Logger', () => {
+describe("Logger", () => {
   let originalConsoleLog: typeof console.log;
   let originalConsoleError: typeof console.error;
   let logOutput: string[] = [];
@@ -14,11 +14,11 @@ describe('Logger', () => {
     originalConsoleError = console.error;
 
     console.log = (...args) => {
-      logOutput.push(args.join(' '));
+      logOutput.push(args.join(" "));
     };
 
     console.error = (...args) => {
-      errorOutput.push(args.join(' '));
+      errorOutput.push(args.join(" "));
     };
   });
 
@@ -34,32 +34,32 @@ describe('Logger', () => {
     errorOutput = [];
   });
 
-  describe('Text formatter', () => {
-    it('should export standalone Formatter', () => {
+  describe("Text formatter", () => {
+    it("should export standalone Formatter", () => {
       assert.ok(Formatter);
-      assert.ok(typeof Formatter === 'function');
+      assert.ok(typeof Formatter === "function");
     });
 
-    it('should format text without logging', () => {
-      const text = 'Red text';
+    it("should format text without logging", () => {
+      const text = "Red text";
       const formatted = Formatter.red(text);
-      assert.strictEqual(typeof formatted, 'string');
+      assert.strictEqual(typeof formatted, "string");
       assert.ok(formatted.includes(text));
       assert.strictEqual(logOutput.length, 0); // Should not log
     });
 
-    it('should support chained text formatting', () => {
-      const text = 'Bold red text';
+    it("should support chained text formatting", () => {
+      const text = "Bold red text";
       const formatted = Formatter.bold.red(text);
-      assert.strictEqual(typeof formatted, 'string');
+      assert.strictEqual(typeof formatted, "string");
       assert.ok(formatted.includes(text));
       assert.strictEqual(logOutput.length, 0); // Should not log
     });
 
-    it('should work in template literals', () => {
-      const fileName = 'test-file';
-      const key = 'testFunction';
-      const separator = '#';
+    it("should work in template literals", () => {
+      const fileName = "test-file";
+      const key = "testFunction";
+      const separator = "#";
       const result = `${fileName}${Formatter.dim(separator)}${key}`;
 
       assert.ok(result.includes(fileName));
@@ -69,88 +69,82 @@ describe('Logger', () => {
     });
   });
 
-  describe('Basic logging', () => {
-    it('should log basic messages', () => {
-      Logger('Hello World');
+  describe("Basic logging", () => {
+    it("should log basic messages", () => {
+      Logger("Hello World");
       assert.ok(logOutput.length > 0);
-      assert.ok(logOutput[0].includes('Hello World'));
+      assert.ok(logOutput[0].includes("Hello World"));
     });
 
-    it('should support chaining', () => {
-      const result = Logger('Test message');
+    it("should support chaining", () => {
+      const result = Logger("Test message");
       // Logger function returns a new Logger instance when called
-      assert.ok(typeof result === 'function');
-      assert.ok(
-        result.name === 'Logger' || result.constructor.name === 'Logger',
-      );
+      assert.ok(typeof result === "function");
+      assert.ok(result.name === "Logger" || result.constructor.name === "Logger");
     });
   });
 
-  describe('Semantic logging methods', () => {
-    it('should log info messages', () => {
-      Logger.info('Information message');
+  describe("Semantic logging methods", () => {
+    it("should log info messages", () => {
+      Logger.info("Information message");
       assert.ok(logOutput.length > 0);
-      assert.ok(logOutput[0].includes('Information message'));
-      assert.ok(logOutput[0].includes('ℹ')); // Info icon
+      assert.ok(logOutput[0].includes("Information message"));
+      assert.ok(logOutput[0].includes("ℹ")); // Info icon
     });
 
-    it('should log success messages', () => {
-      Logger.success('Success message');
+    it("should log success messages", () => {
+      Logger.success("Success message");
       assert.ok(logOutput.length > 0);
-      assert.ok(logOutput[0].includes('Success message'));
-      assert.ok(logOutput[0].includes('✔︎')); // Success icon
+      assert.ok(logOutput[0].includes("Success message"));
+      assert.ok(logOutput[0].includes("✔︎")); // Success icon
     });
 
-    it('should log error messages', () => {
-      Logger.error('Error message');
+    it("should log error messages", () => {
+      Logger.error("Error message");
       assert.ok(logOutput.length > 0);
-      assert.ok(logOutput[0].includes('Error message'));
-      assert.ok(logOutput[0].includes('✖︎')); // Error icon
+      assert.ok(logOutput[0].includes("Error message"));
+      assert.ok(logOutput[0].includes("✖︎")); // Error icon
     });
 
-    it('should log warning messages', () => {
-      Logger.warn('Warning message');
+    it("should log warning messages", () => {
+      Logger.warn("Warning message");
       assert.ok(logOutput.length > 0);
-      assert.ok(logOutput[0].includes('Warning message'));
-      assert.ok(logOutput[0].includes('⚠︎')); // Warning icon
+      assert.ok(logOutput[0].includes("Warning message"));
+      assert.ok(logOutput[0].includes("⚠︎")); // Warning icon
     });
 
-    it('should log debug messages', () => {
-      Logger.debug('Debug message');
+    it("should log debug messages", () => {
+      Logger.debug("Debug message");
       assert.ok(logOutput.length > 0);
-      assert.ok(logOutput[0].includes('Debug message'));
-      assert.ok(logOutput[0].includes('⚙︎')); // Debug icon
+      assert.ok(logOutput[0].includes("Debug message"));
+      assert.ok(logOutput[0].includes("⚙︎")); // Debug icon
     });
 
-    it('should log pending messages', () => {
-      Logger.pending('Pending message');
+    it("should log pending messages", () => {
+      Logger.pending("Pending message");
       assert.ok(logOutput.length > 0);
-      assert.ok(logOutput[0].includes('Pending message'));
-      assert.ok(logOutput[0].includes('…')); // Pending icon
+      assert.ok(logOutput[0].includes("Pending message"));
+      assert.ok(logOutput[0].includes("…")); // Pending icon
     });
   });
 
-  describe('Color formatting', () => {
-    it('should return chainable logger for color methods', () => {
+  describe("Color formatting", () => {
+    it("should return chainable logger for color methods", () => {
       const redLogger = Logger.red;
-      assert.ok(
-        typeof redLogger === 'function' || typeof redLogger === 'object',
-      );
+      assert.ok(typeof redLogger === "function" || typeof redLogger === "object");
 
       const blueLogger = Logger.blue;
-      assert.ok(
-        typeof blueLogger === 'function' || typeof blueLogger === 'object',
-      );
+      assert.ok(typeof blueLogger === "function" || typeof blueLogger === "object");
     });
 
-    it('should support chained color formatting', () => {
-      Logger.red.bold('Red and bold text');
+    it("should support chained color formatting", () => {
+      Logger.red.bold("Red and bold text");
       assert.ok(logOutput.length > 0);
-      assert.ok(logOutput[0].includes('Red and bold text'));
+      assert.ok(logOutput[0].includes("Red and bold text"));
     });
   });
 
-  describe('Group functionality', () => {
+  describe("Group functionality", () => {
     let originalConsoleGroup: typeof console.group;
     let originalConsoleGroupEnd: typeof console.groupEnd;
     let groupCalls: [string, ...unknown[]][] = [];
@@ -160,11 +154,11 @@ describe('Logger', () => {
       originalConsoleGroupEnd = console.groupEnd;
 
       console.group = (...args) => {
-        groupCalls.push(['group', ...args]);
+        groupCalls.push(["group", ...args]);
       };
 
       console.groupEnd = () => {
-        groupCalls.push(['groupEnd']);
+        groupCalls.push(["groupEnd"]);
       };
     });
 
@@ -177,17 +171,17 @@ describe('Logger', () => {
       groupCalls = [];
     });
 
-    it('should support grouping', () => {
-      Logger.group('Test Group');
+    it("should support grouping", () => {
+      Logger.group("Test Group");
       Logger.groupEnd();
 
       assert.strictEqual(groupCalls.length, 2);
-      assert.strictEqual(groupCalls[0][0], 'group');
-      assert.strictEqual(groupCalls[1][0], 'groupEnd');
+      assert.strictEqual(groupCalls[0][0], "group");
+      assert.strictEqual(groupCalls[1][0], "groupEnd");
     });
   });
 
-  describe('Table functionality', () => {
+  describe("Table functionality", () => {
     let originalConsoleTable: typeof console.table;
     let tableCalls: unknown[][] = [];
 
@@ -206,10 +200,10 @@ describe('Logger', () => {
       tableCalls = [];
     });
 
-    it('should support table output', () => {
+    it("should support table output", () => {
       const data = [
-        { name: 'Test 1', value: 100 },
-        { name: 'Test 2', value: 200 },
+        { name: "Test 1", value: 100 },
+        { name: "Test 2", value: 200 },
       ];
 
       Logger.table(data);

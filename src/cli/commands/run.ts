@@ -1,87 +1,81 @@
-import { existsSync } from 'node:fs';
-import { basename, extname, resolve } from 'node:path';
-import { command } from '@gud/cli';
-import {
-  benchmark,
-  type RunOptions,
-  type TestFunction,
-} from '#src/lib/Benchmark';
-import { Formatter, Logger } from '#src/lib/utils/Logger';
-import { loadModule } from '#src/lib/utils/loadModule';
+import { existsSync } from "node:fs";
+import { basename, extname, resolve } from "node:path";
+import { command } from "@gud/cli";
+import { benchmark, type RunOptions, type TestFunction } from "#src/lib/Benchmark";
+import { Formatter, Logger } from "#src/lib/utils/Logger";
+import { loadModule } from "#src/lib/utils/loadModule";
 
-declare module '@gud/cli' {
+declare module "@gud/cli" {
   interface CustomOptionTypes {
-    'gc-strategy': Required<RunOptions>['gcStrategy'];
+    "gc-strategy": Required<RunOptions>["gcStrategy"];
     verbosity: 0 | 1 | 2;
   }
 }
 
 export default command({
-  description: 'Run arbitrary JavaScript/TypeScript files as benchmarks',
+  description: "Run arbitrary JavaScript/TypeScript files as benchmarks",
 
   options: {
     files: {
-      alias: ['f'],
-      description: 'List of file paths to benchmark',
-      type: 'array',
+      alias: ["f"],
+      description: "List of file paths to benchmark",
+      type: "array",
       required: true,
     },
     runs: {
-      alias: ['r'],
-      description: 'Number of runs for the benchmark',
-      type: 'number',
+      alias: ["r"],
+      description: "Number of runs for the benchmark",
+      type: "number",
       default: 1e5,
     },
     coolDown: {
-      alias: ['c'],
-      description: 'Cool down time between runs in MS',
-      type: 'number',
+      alias: ["c"],
+      description: "Cool down time between runs in MS",
+      type: "number",
     },
     cycles: {
-      alias: ['cy'],
-      description:
-        'Number of test cycles to run for better statistical accuracy',
-      type: 'number',
+      alias: ["cy"],
+      description: "Number of test cycles to run for better statistical accuracy",
+      type: "number",
       default: 1,
     },
     preheat: {
-      alias: ['p'],
-      description: 'Number of preheat iterations',
-      type: 'number',
+      alias: ["p"],
+      description: "Number of preheat iterations",
+      type: "number",
       default: 1e3,
     },
     name: {
-      alias: ['n'],
-      description: 'Custom name for the benchmark suite',
-      type: 'string',
+      alias: ["n"],
+      description: "Custom name for the benchmark suite",
+      type: "string",
     },
     verbosity: {
-      alias: ['v'],
-      description: 'Verbosity level (0=silent, 1=basic, 2=detailed)',
-      type: 'number',
-      customType: 'verbosity',
+      alias: ["v"],
+      description: "Verbosity level (0=silent, 1=basic, 2=detailed)",
+      type: "number",
+      customType: "verbosity",
       choices: [0, 1, 2],
       default: 1,
     },
     export: {
-      alias: ['e'],
-      description: 'Export benchmark results to JSON',
-      type: 'boolean',
+      alias: ["e"],
+      description: "Export benchmark results to JSON",
+      type: "boolean",
       default: false,
     },
     gcStrategy: {
-      alias: ['gc'],
-      description: 'Garbage collection strategy',
-      type: 'string',
-      customType: 'gc-strategy',
-      choices: ['never', 'per-cycle', 'per-test', 'periodic'],
-      default: 'periodic',
+      alias: ["gc"],
+      description: "Garbage collection strategy",
+      type: "string",
+      customType: "gc-strategy",
+      choices: ["never", "per-cycle", "per-test", "periodic"],
+      default: "periodic",
     },
     gcInterval: {
-      alias: ['gci'],
-      description:
-        'For periodic GC strategy, number of iterations between GC calls',
-      type: 'number',
+      alias: ["gci"],
+      description: "For periodic GC strategy, number of iterations between GC calls",
+      type: "number",
       default: 1000,
     },
   },
@@ -114,7 +108,7 @@ export default command({
 
     if (verbosity > 0) {
       Logger.pending(
-        `📁 Loading ${resolvedFiles.length} file${resolvedFiles.length > 1 ? 's' : ''} for benchmarking...`,
+        `📁 Loading ${resolvedFiles.length} file${resolvedFiles.length > 1 ? "s" : ""} for benchmarking...`,
       );
     }
 
@@ -127,19 +121,19 @@ export default command({
         const moduleExports = await loadModule(filePath);
 
         // Handle different export patterns
-        if (typeof moduleExports.default === 'function') {
+        if (typeof moduleExports.default === "function") {
           bench.test(fileName, moduleExports.default);
           continue;
         }
-        if (typeof moduleExports.benchmark === 'function') {
+        if (typeof moduleExports.benchmark === "function") {
           bench.test(fileName, moduleExports.benchmark);
           continue;
         }
-        if (typeof moduleExports.test === 'function') {
+        if (typeof moduleExports.test === "function") {
           bench.test(fileName, moduleExports.test);
           continue;
         }
-        if (typeof moduleExports === 'function') {
+        if (typeof moduleExports === "function") {
           bench.test(fileName, moduleExports);
           continue;
         }
@@ -147,12 +141,9 @@ export default command({
         // Look for any exported function
         let didFindFunction = false;
         for (const [key, value] of Object.entries(moduleExports)) {
-          if (typeof value === 'function') {
+          if (typeof value === "function") {
             didFindFunction = true;
-            bench.test(
-              `${fileName}${Formatter.dim('#')}${key}`,
-              value as TestFunction,
-            );
+            bench.test(`${fileName}${Formatter.dim("#")}${key}`, value as TestFunction);
           }
         }
 
@@ -166,7 +157,7 @@ export default command({
     }
 
     if (!bench.tests.length) {
-      throw new Error('No test functions found to benchmark');
+      throw new Error("No test functions found to benchmark");
     }
 
     // Preheat

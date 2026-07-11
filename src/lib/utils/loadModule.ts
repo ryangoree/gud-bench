@@ -1,11 +1,6 @@
-import { readFileSync } from 'node:fs';
-import { extname } from 'node:path';
-import {
-  ModuleKind,
-  ModuleResolutionKind,
-  ScriptTarget,
-  transpile,
-} from 'typescript';
+import { readFileSync } from "node:fs";
+import { extname } from "node:path";
+import { ModuleKind, ModuleResolutionKind, ScriptTarget, transpile } from "typescript";
 
 /**
  * Load a module from a file path, with automatic TypeScript transpilation.
@@ -13,12 +8,11 @@ import {
  * are transpiled to JavaScript before loading.
  */
 export async function loadModule(filePath: string) {
-  const isTypeScript =
-    extname(filePath) === '.ts' || extname(filePath) === '.tsx';
+  const isTypeScript = extname(filePath) === ".ts" || extname(filePath) === ".tsx";
 
   if (isTypeScript) {
     // Read and transpile TypeScript
-    const tsContent = readFileSync(filePath, 'utf-8');
+    const tsContent = readFileSync(filePath, "utf-8");
     const jsContent = transpile(tsContent, {
       module: ModuleKind.ESNext,
       target: ScriptTarget.ESNext,
@@ -28,9 +22,7 @@ export async function loadModule(filePath: string) {
     });
 
     // Create a data URL with the transpiled JavaScript
-    const dataUrl = `data:text/javascript;base64,${Buffer.from(
-      jsContent,
-    ).toString('base64')}`;
+    const dataUrl = `data:text/javascript;base64,${Buffer.from(jsContent).toString("base64")}`;
     return await import(dataUrl);
   } else {
     // Load JavaScript file directly

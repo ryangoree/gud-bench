@@ -1,6 +1,6 @@
-import { writeFileSync } from 'node:fs';
-import { getTCritical95 } from '#src/lib/utils/getTCritical95';
-import { Formatter, Logger } from '#src/lib/utils/Logger';
+import { writeFileSync } from "node:fs";
+import { getTCritical95 } from "#src/lib/utils/getTCritical95";
+import { Formatter, Logger } from "#src/lib/utils/Logger";
 
 export type TestFunction<V = any, R = any> = (value: V) => R | Promise<R>;
 
@@ -70,7 +70,7 @@ export type RunOptions<V = any, R = any> = {
    *
    * @default 'periodic'
    */
-  gcStrategy?: 'never' | 'per-cycle' | 'per-test' | 'periodic';
+  gcStrategy?: "never" | "per-cycle" | "per-test" | "periodic";
 
   /**
    * For 'periodic' GC strategy, how many iterations between GC calls.
@@ -91,18 +91,14 @@ export type RunArgs<V = any, R = any> = undefined extends V
 
 export type PreheatOptions<V = any> = Pick<
   RunOptions<V>,
-  'value' | 'verbosity' | 'gcStrategy' | 'gcInterval'
+  "value" | "verbosity" | "gcStrategy" | "gcInterval"
 >;
 
 export type PreheatArgs<V = any> = undefined extends V
   ? [number, PreheatOptions<V>?]
   : [number, PreheatOptions<V>];
 
-export class Benchmark<
-  TTestName extends string & {} = string & {},
-  TValue = any,
-  TReturn = any,
-> {
+export class Benchmark<TTestName extends string & {} = string & {}, TValue = any, TReturn = any> {
   name: string;
 
   /**
@@ -112,7 +108,7 @@ export class Benchmark<
 
   #tests: TestFunctions = [];
 
-  constructor(name = 'Benchmark') {
+  constructor(name = "Benchmark") {
     this.name = name;
   }
 
@@ -137,7 +133,7 @@ export class Benchmark<
     name: N | TestFunction<V, R>,
     fn = name as TestFunction<V, R>,
   ): Benchmark<TTestName | N, V, R> {
-    if (typeof name === 'function') {
+    if (typeof name === "function") {
       name = `Test ${this.tests.length + 1}` as N;
     }
     this.#tests.push({ name, fn });
@@ -150,10 +146,7 @@ export class Benchmark<
    * @param options - Options for the preheat.
    */
   preheat(
-    ...[
-      iterations,
-      { value, verbosity = 1, gcStrategy, gcInterval } = {},
-    ]: PreheatArgs<TValue>
+    ...[iterations, { value, verbosity = 1, gcStrategy, gcInterval } = {}]: PreheatArgs<TValue>
   ): Promise<this> {
     if (verbosity > 0) {
       Logger.pending(
@@ -173,14 +166,12 @@ export class Benchmark<
    * @param iterations - The number of times to run each test.
    * @param options - Options for the run.
    */
-  async run(
-    ...[iterations = 1e5, options]: RunArgs<TValue, TReturn>
-  ): Promise<this> {
+  async run(...[iterations = 1e5, options]: RunArgs<TValue, TReturn>): Promise<this> {
     const {
       coolDown,
       cycles = 1,
       gcInterval = 1000,
-      gcStrategy = 'periodic',
+      gcStrategy = "periodic",
       name,
       value,
       verbosity = 1,
@@ -190,28 +181,26 @@ export class Benchmark<
 
     // Show overall benchmark info
     if (verbosity > 0) {
-      if (!hasGC && gcStrategy !== 'never') {
-        Logger.warn('No GC hook! Consider running with --expose-gc');
+      if (!hasGC && gcStrategy !== "never") {
+        Logger.warn("No GC hook! Consider running with --expose-gc");
       }
       Logger.group(
-        `${this.name}${name ? `${Formatter.dim(' - ')}${name}` : ''}${
-          cycles > 1 ? Formatter.dim(` (${cycles} cycles)`) : ''
+        `${this.name}${name ? `${Formatter.dim(" - ")}${name}` : ""}${
+          cycles > 1 ? Formatter.dim(` (${cycles} cycles)`) : ""
         }`,
       ).pending(
-        `Running ${cycles} ${cycles > 1 ? 'cycles' : 'cycle'} of ${
-          this.tests.length
-        } ${
-          this.tests.length > 1 ? 'tests' : 'test'
+        `Running ${cycles} ${cycles > 1 ? "cycles" : "cycle"} of ${this.tests.length} ${
+          this.tests.length > 1 ? "tests" : "test"
         } ${iterations} times each...`,
       );
       if (verbosity > 1) {
         Logger.log(
           `GC Strategy: ${gcStrategy}${
-            gcStrategy === 'periodic' ? ` (every ${gcInterval} iterations)` : ''
+            gcStrategy === "periodic" ? ` (every ${gcInterval} iterations)` : ""
           }`,
         );
         if (value !== undefined) {
-          Logger.log('Value:', value);
+          Logger.log("Value:", value);
         }
       }
     }
@@ -230,7 +219,7 @@ export class Benchmark<
       }
 
       // Force GC before each cycle if strategy allows
-      if (hasGC && gcStrategy === 'per-cycle') {
+      if (hasGC && gcStrategy === "per-cycle") {
         globalThis.gc?.();
       }
 
@@ -302,41 +291,38 @@ export class Benchmark<
             Runs: test.samples.length.toLocaleString(undefined, {
               maximumFractionDigits: 0,
             }),
-            'Total Time (ms)': test.totalTime.toLocaleString(undefined, {
+            "Total Time (ms)": test.totalTime.toLocaleString(undefined, {
               minimumFractionDigits: 4,
               maximumFractionDigits: 4,
             }),
-            'AVG Time (ms)': (
-              test.meanTime ?? test.totalTime / test.samples.length
-            ).toLocaleString(undefined, {
-              minimumFractionDigits: 6,
-              maximumFractionDigits: 6,
-            }),
+            "AVG Time (ms)": (test.meanTime ?? test.totalTime / test.samples.length).toLocaleString(
+              undefined,
+              {
+                minimumFractionDigits: 6,
+                maximumFractionDigits: 6,
+              },
+            ),
           };
 
           // Add enhanced statistics if available
           if (test.opsPerSecond) {
-            data['Ops/Sec'] = test.opsPerSecond.toLocaleString(undefined, {
+            data["Ops/Sec"] = test.opsPerSecond.toLocaleString(undefined, {
               minimumFractionDigits: 6,
               maximumFractionDigits: 6,
             });
           }
 
           if (test.meanTime && test.marginOfError) {
-            data['± (%)'] = `${(
-              test.marginOfError / test.meanTime
-            ).toLocaleString(undefined, {
+            data["± (%)"] = `${(test.marginOfError / test.meanTime).toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
-              style: 'percent',
+              style: "percent",
             })}`;
           }
 
           return [
             this.results.length > 1
-              ? `${i + 1} ${Formatter.dim('-')} ${Formatter.bold(test.name)}${
-                  i === 0 ? ' 🏆' : ''
-                }`
+              ? `${i + 1} ${Formatter.dim("-")} ${Formatter.bold(test.name)}${i === 0 ? " 🏆" : ""}`
               : Formatter.bold(test.name),
             data,
           ];
@@ -374,8 +360,7 @@ export class Benchmark<
     return {
       i,
       test: queue[i]!,
-      clonedValue:
-        value && typeof value === 'object' ? structuredClone(value) : value,
+      clonedValue: value && typeof value === "object" ? structuredClone(value) : value,
     };
   }
 
@@ -400,14 +385,14 @@ export class Benchmark<
     const testCompleted = ++test.runs >= iterations;
     if (testCompleted) queue.splice(i, 1);
     if (validate) {
-      const validationResult = validate(result, value) || 'Validation failed';
+      const validationResult = validate(result, value) || "Validation failed";
       if (validationResult !== true) throw validationResult;
     }
     return testCompleted;
   }
 
   #handleGarbageCollection(
-    strategy: 'never' | 'per-cycle' | 'per-test' | 'periodic',
+    strategy: "never" | "per-cycle" | "per-test" | "periodic",
     {
       testCompleted,
       iterationCount,
@@ -419,18 +404,18 @@ export class Benchmark<
     },
   ) {
     switch (strategy) {
-      case 'never':
+      case "never":
         // No GC
         break;
-      case 'per-cycle':
+      case "per-cycle":
         // GC is handled before cycle starts
         break;
-      case 'per-test':
+      case "per-test":
         if (testCompleted) {
           globalThis.gc?.();
         }
         break;
-      case 'periodic':
+      case "periodic":
         if (iterationCount % gcInterval === 0) {
           globalThis.gc?.();
         }
@@ -470,8 +455,7 @@ export class Benchmark<
 
       // Calculate margin of error (95% confidence interval)
       const criticalTValue = getTCritical95(degreesOfFreedom);
-      result.marginOfError =
-        criticalTValue * (result.stdDeviation / Math.sqrt(sampleSize));
+      result.marginOfError = criticalTValue * (result.stdDeviation / Math.sqrt(sampleSize));
     }
   }
 }
@@ -479,6 +463,6 @@ export class Benchmark<
 /**
  * Create a new benchmark suite.
  */
-export function benchmark<N extends string & {}, V, R>(name = 'Benchmark') {
+export function benchmark<N extends string & {}, V, R>(name = "Benchmark") {
   return new Benchmark<N, V, R>(name);
 }

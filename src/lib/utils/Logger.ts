@@ -1,4 +1,4 @@
-import readlinePromises from 'node:readline/promises';
+import readlinePromises from "node:readline/promises";
 
 // Select Graphic Rendition (SGR) Formatting Syntax:
 //
@@ -10,35 +10,35 @@ import readlinePromises from 'node:readline/promises';
 //
 // Example: '\x1b[4;31mHello\x1b[0m' formats "Hello" in underlined (4) red (31).
 
-const ESC = '\x1b';
-const CSI = '[';
+const ESC = "\x1b";
+const CSI = "[";
 
 const SGR = {
-  RESET: '0',
+  RESET: "0",
 
-  BOLD: '1',
-  DIM: '2',
-  RESET_WEIGHT: '22', // Resets bold + dim
+  BOLD: "1",
+  DIM: "2",
+  RESET_WEIGHT: "22", // Resets bold + dim
 
-  ITALIC: '3',
-  RESET_ITALIC: '23',
+  ITALIC: "3",
+  RESET_ITALIC: "23",
 
-  UNDERLINE: '4',
-  RESET_UNDERLINE: '24',
+  UNDERLINE: "4",
+  RESET_UNDERLINE: "24",
 
-  STRIKETHROUGH: '9',
-  RESET_STRIKETHROUGH: '29',
+  STRIKETHROUGH: "9",
+  RESET_STRIKETHROUGH: "29",
 
   // 3-bit mask for foreground colors, in blue-green-red order
   // e.g., 6 = 110 = blue + green, no red
-  RED: '31',
-  GREEN: '32',
-  YELLOW: '33',
-  BLUE: '34',
-  MAGENTA: '35',
-  CYAN: '36',
-  WHITE: '37',
-  DEFAULT: '39',
+  RED: "31",
+  GREEN: "32",
+  YELLOW: "33",
+  BLUE: "34",
+  MAGENTA: "35",
+  CYAN: "36",
+  WHITE: "37",
+  DEFAULT: "39",
 } as const;
 type SgrStyle = (typeof SGR)[keyof typeof SGR];
 
@@ -66,7 +66,7 @@ const ANSI = {
 } as const;
 
 function formatText(styles: SgrStyle[], ...text: unknown[]): string {
-  return `${ESC}${CSI}${styles.join(';')}m${text.join(' ')}${ANSI.RESET}`;
+  return `${ESC}${CSI}${styles.join(";")}m${text.join(" ")}${ANSI.RESET}`;
 }
 
 // Text Formatter //
@@ -472,7 +472,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     log: {
       value(...msg: unknown[]) {
-        const prefix = formatText([SGR.BLUE], '✦');
+        const prefix = formatText([SGR.BLUE], "✦");
         console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
@@ -482,7 +482,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     info: {
       value(...msg: unknown[]) {
-        const prefix = formatText([SGR.CYAN], 'ℹ');
+        const prefix = formatText([SGR.CYAN], "ℹ");
         console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
@@ -492,7 +492,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     success: {
       value(...msg: unknown[]) {
-        const prefix = formatText([SGR.GREEN], '✔︎');
+        const prefix = formatText([SGR.GREEN], "✔︎");
         console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
@@ -502,7 +502,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     warn: {
       value(...msg: unknown[]) {
-        const prefix = formatText([SGR.YELLOW], '⚠︎');
+        const prefix = formatText([SGR.YELLOW], "⚠︎");
         console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
@@ -512,7 +512,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     error: {
       value(...msg: unknown[]) {
-        const prefix = formatText([SGR.RED], '✖︎ error:');
+        const prefix = formatText([SGR.RED], "✖︎ error:");
         console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
@@ -522,7 +522,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     debug: {
       value(...msg: unknown[]) {
-        const prefix = formatText([SGR.YELLOW], '⚙︎ debug:');
+        const prefix = formatText([SGR.YELLOW], "⚙︎ debug:");
         console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
@@ -532,7 +532,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     },
     pending: {
       value(...msg: unknown[]) {
-        const prefix = formatText([SGR.BLUE], '…');
+        const prefix = formatText([SGR.BLUE], "…");
         console.log(prefix, formatText(styles, ...msg));
         return createLogger();
       },
@@ -543,7 +543,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     group: {
       value(...label: unknown[]) {
         if (label.length) {
-          const prefix = formatText([SGR.CYAN], '▾');
+          const prefix = formatText([SGR.CYAN], "▾");
           console.group(prefix, formatText(styles, ...label));
         } else {
           console.group();
@@ -575,27 +575,24 @@ function createLogger(styles: SgrStyle[] = []): Logger {
     confirm: {
       value(
         msg: string,
-        {
-          cancelMessage = 'Operation canceled.',
-          defaultValue = true,
-        }: LoggerConfirmOptions = {},
+        { cancelMessage = "Operation canceled.", defaultValue = true }: LoggerConfirmOptions = {},
       ): Promise<boolean> {
-        const prefix = formatText([SGR.CYAN], '? ');
+        const prefix = formatText([SGR.CYAN], "? ");
         const suffix = defaultValue
-          ? ` [${formatText([SGR.GREEN], 'Y')}/n]`
-          : ` [y/${formatText([SGR.RED], 'N')}]`;
+          ? ` [${formatText([SGR.GREEN], "Y")}/n]`
+          : ` [y/${formatText([SGR.RED], "N")}]`;
 
         const formattedMsg = formatText(styles, msg);
 
         const question = `${prefix}${formattedMsg}${suffix}? `;
-        const cancelPrefix = formatText([SGR.RED], '✖︎ ');
+        const cancelPrefix = formatText([SGR.RED], "✖︎ ");
 
         const rl = readlinePromises.createInterface({
           input: process.stdin,
           output: process.stdout,
         });
 
-        rl.on('SIGINT', () => {
+        rl.on("SIGINT", () => {
           console.log(); // Move to a new line
           if (cancelMessage) {
             console.log(`${cancelPrefix}${cancelMessage}`);
@@ -608,9 +605,7 @@ function createLogger(styles: SgrStyle[] = []): Logger {
 
           if (!answer.match(/^(|y|yes|n|no)$/i)) {
             // Create fresh logger for error message to avoid contamination
-            createLogger().error(
-              'Invalid answer. Please enter y, yes, n, or no',
-            );
+            createLogger().error("Invalid answer. Please enter y, yes, n, or no");
             return ask();
           }
 
