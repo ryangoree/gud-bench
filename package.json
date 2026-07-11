@@ -26,11 +26,9 @@
     "watch": "tsc --build tsconfig.cli.json tsconfig.lib.json --watch",
     "bench": "node dist/cli.js",
     "test": "tsx --test tests/*.test.ts",
-    "format": "biome format --write",
-    "lint": "biome lint --diagnostic-level error .",
-    "lint:fix": "npm:lint --fix",
-    "lint:fix:unsafe": "npm:lint:fix --unsafe",
     "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && biome check --diagnostic-level error . ",
+    "fix": "biome check --diagnostic-level error . --write",
     "release": "npm run build && changeset publish"
   },
   "peerDependencies": {
