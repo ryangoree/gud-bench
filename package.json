@@ -28,6 +28,7 @@
     "test": "tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && biome check --diagnostic-level error . ",
+    "check:package": "publint",
     "fix": "biome check --diagnostic-level error . --write",
     "release": "npm run build && changeset publish"
   },
@@ -42,6 +43,7 @@
     "@biomejs/biome": "^2.5.3",
     "@changesets/cli": "^2.31.0",
     "@types/node": "^26.1.1",
+    "publint": "^0.3.21",
     "tsx": "^4.23.0",
     "typescript": "^7.0.2"
   },
