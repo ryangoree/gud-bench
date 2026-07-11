@@ -41,11 +41,11 @@
     "@gud/cli-menu": "^1.0.0-beta.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.2",
-    "@changesets/cli": "^2.29.6",
-    "@types/node": "^24.3.0",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2"
+    "@biomejs/biome": "^2.5.3",
+    "@changesets/cli": "^2.31.0",
+    "@types/node": "^26.1.1",
+    "tsx": "^4.23.0",
+    "typescript": "^7.0.2"
   },
   "imports": {
     "#src/*": "./dist/*.js"

@@ -10,9 +10,8 @@
     "isolatedModules": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
     "paths": {
-      "#src/*": ["src/*.ts"]
+      "#src/*": ["./src/*.ts"]
     },
 
     // Type Checking
