@@ -4,6 +4,7 @@
   "compilerOptions": {
     // Environment
     "lib": ["ESNext"],
+    "types": ["node"],
     "module": "NodeNext",
     "moduleDetection": "force",
     "moduleResolution": "NodeNext",
