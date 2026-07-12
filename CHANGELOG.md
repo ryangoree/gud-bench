@@ -1,5 +1,21 @@
 # @gud/bench
 
+## 2.0.0
+
+### Major Changes
+
+- d851531: Removed the `TestResults` type which was just `TestResult[]`.
+- 5eb3138: Removed the `formatNumber` util and replaced internal usage with `toLocaleString()` method calls.
+
+### Minor Changes
+
+- 4c62ffa: Added a type param for the test names to help with intellisense.
+- 2248cd5: Switched to `tsx` for typescript module loading, removed typescript peer dependency.
+
+### Patch Changes
+
+- 04d57b5: Cleaned up output formatting for many tests.
+
 ## 2.0.0-next.0
 
 ### Major Changes
