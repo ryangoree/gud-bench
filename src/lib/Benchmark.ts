@@ -320,12 +320,14 @@ export class Benchmark<TTestName extends string & {} = string & {}, TValue = any
             })}`;
           }
 
-          return [
-            this.results.length > 1
-              ? `${i + 1} ${Formatter.dim("-")} ${Formatter.bold(test.name)}${i === 0 ? " 🏆" : ""}`
-              : Formatter.bold(test.name),
-            data,
-          ];
+          let label = Formatter.bold(test.name);
+          if (this.results.length > 1) {
+            const maxPlaceLength = this.results.length.toString().length;
+            const place = `${i + 1}`.padStart(maxPlaceLength, " ");
+            label = `${place} ${Formatter.dim("-")} ${label}${i === 0 ? " 🏆" : ""}`;
+          }
+
+          return [label, data];
         }),
     );
 
