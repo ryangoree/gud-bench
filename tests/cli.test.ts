@@ -117,7 +117,7 @@ describe("CLI Integration", () => {
       assert.match(result.stdout, /fastFunction/);
       assert.match(result.stdout, /slowFunction/);
       assert.match(result.stdout, /asyncFunction/);
-      assert.match(result.stdout, /Loading 1 files/);
+      assert.match(result.stdout, /Loading 1 file/);
       assert.match(result.stdout, /Ops\/Sec/);
     });
 
@@ -168,7 +168,7 @@ describe("CLI Integration", () => {
       assert.strictEqual(result.stderr, "");
       assert.match(result.stdout, /typedSort/);
       assert.match(result.stdout, /arraySum/);
-      assert.match(result.stdout, /Loading 1 files/);
+      assert.match(result.stdout, /Loading 1 file/);
     });
   });
 
