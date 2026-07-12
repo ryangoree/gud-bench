@@ -1,8 +1,12 @@
 {
-  "mode": "pre",
+  "mode": "exit",
   "tag": "next",
   "initialVersions": {
     "@gud/bench": "1.1.0"
   },
-  "changesets": ["fresh-pillows-wait", "silver-rings-brake", "silver-shoes-cut"]
+  "changesets": [
+    "fresh-pillows-wait",
+    "silver-rings-brake",
+    "silver-shoes-cut"
+  ]
 }
